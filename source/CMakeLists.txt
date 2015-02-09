@@ -30,7 +30,7 @@ set(GLEXAMPLES_DEPENDENCY_LIBRARIES
 
 # Applications
 set(IDE_FOLDER "")
-add_subdirectory(stochastic_transparency)
+add_subdirectory(cubescape)
 add_subdirectory(viewer)
 
 # Tests

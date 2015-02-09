@@ -5,13 +5,36 @@ message(STATUS "App ${target}")
 
 # External libraries
 
-# ...
+# Qt5
+
+# good resource: http://www.kdab.com/using-cmake-with-qt-5/
+
+# http://qt-project.org/forums/viewthread/30006/
+if(MSVC)
+    cmake_policy(SET CMP0020 NEW)
+endif()
+
+find_package(Qt5Core    5.1 REQUIRED)
+find_package(Qt5Gui     5.1 REQUIRED)
+find_package(Qt5Widgets 5.1 REQUIRED)
+find_package(Qt5OpenGL  5.1 REQUIRED)
+
+if (NOT Qt5Core_FOUND)
+    message("App ${target} skipped: Qt5 not found")
+    return()
+endif()
+
+# Qt5 options
+
+set(CMAKE_AUTOMOC ON)
 
 
 # Includes
 
 include_directories(
     BEFORE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 
@@ -19,28 +42,36 @@ include_directories(
 
 set(libs
     ${GLEXAMPLES_DEPENDENCY_LIBRARIES}
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::OpenGL
 )
-
-
-# Compiler definitions
-
-if (OPTION_BUILD_STATIC)
-    add_definitions("-D${META_PROJECT_NAME_UPPER}_STATIC")
-endif()
 
 
 # Sources
 
+set(headers
+    QtViewerMapping.h
+)
+
 set(sources
+    QtViewerMapping.cpp
     main.cpp
 )
 
 
 # Build executable
 
-add_executable(${target} ${sources})
+add_executable(${target} ${headers} ${sources})
 
 target_link_libraries(${target} ${libs})
+
+
+if(MSVC)
+    # -> msvc14 : declaration hides class member (problem in qt)
+    set(DEFAULT_COMPILE_FLAGS ${DEFAULT_COMPILE_FLAGS} /wd4458)
+endif()
 
 target_compile_options(${target} PRIVATE ${DEFAULT_COMPILE_FLAGS})
 

@@ -98,6 +98,8 @@ if(WIN32)
     set(INSTALL_ROOT ".")                       # C:\Programme\<project>
     set(INSTALL_DATA "bin")                     # C:\Programme\<project>
     set(INSTALL_BIN "bin")                      # C:\Programme\<project>
+    set(INSTALL_PLUGINS       "bin/plugins")
+    set(INSTALL_PLUGINS_DEBUG "bin/plugins/debug")
     set(INSTALL_SHARED ".")                     # C:\Programme\<project>
     set(INSTALL_LIB "lib")                      # C:\Programme\<project>\lib
     set(INSTALL_INCLUDE "include")              # C:\Programme\<project>\include
@@ -110,6 +112,8 @@ else()
     set(INSTALL_ROOT "share/${project}")        # /usr/[local]/share/<project>
     set(INSTALL_DATA "share/${project}")        # /usr/[local]/share/<project>
     set(INSTALL_BIN "bin")                      # /usr/[local]/bin
+    set(INSTALL_PLUGINS       "share/${project}/plugins")
+    set(INSTALL_PLUGINS_DEBUG "share/${project}/plugins/debug")
     set(INSTALL_SHARED "lib")                   # /usr/[local]/lib
     set(INSTALL_LIB "lib")                      # /usr/[local]/lib
     set(INSTALL_INCLUDE "include")              # /usr/[local]/include
