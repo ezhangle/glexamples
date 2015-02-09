@@ -31,15 +31,7 @@ public:
     EmptyExample(gloperate::ResourceManager & resourceManager);
     virtual ~EmptyExample();
 
-    void update(float delta);
-
     void setupProjection();
-
-    int numberOfCubes() const;
-    void setNumberOfCubes(const int & number);
-
-    bool animation() const;
-    void setAnimation(const bool & enabled);
 
 protected:
     virtual void onInitialize();
