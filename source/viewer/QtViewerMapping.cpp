@@ -12,6 +12,7 @@
 #include <gloperate/input/WheelEvent.h>
 #include <gloperate/navigation/WorldInHandNavigation.h>
 #include <gloperate/tools/CoordinateProvider.h>
+#include <gloperate-qt/QtOpenGLWindow.h>
 
 #include "util.hpp"
 
@@ -119,10 +120,12 @@ void QtViewerMapping::mapKeyboardEvent(gloperate::AbstractEvent * event)
 
 void QtViewerMapping::mapMouseEvent(gloperate::AbstractEvent * event)
 {
-    const auto mouseEvent = dynamic_cast<MouseEvent*>(event);
+    const auto mouseEvent = dynamic_cast<MouseEvent *>(event);
     
     if (!mouseEvent)
         return;
+    
+    const auto mousePos = mouseEvent->pos() * static_cast<int>(m_window->devicePixelRatio());
     
     if (mouseEvent->type() == MouseEvent::Type::Press)
     {
@@ -132,10 +135,10 @@ void QtViewerMapping::mapMouseEvent(gloperate::AbstractEvent * event)
                 m_navigation->reset();
                 break;
             case MouseButtonLeft:
-                m_navigation->panBegin(mouseEvent->pos());
+                m_navigation->panBegin(mousePos);
                 break;
             case MouseButtonRight:
-                m_navigation->rotateBegin(mouseEvent->pos());
+                m_navigation->rotateBegin(mousePos);
                 break;
             default:
                 break;
@@ -146,10 +149,10 @@ void QtViewerMapping::mapMouseEvent(gloperate::AbstractEvent * event)
         switch (m_navigation->mode())
         {
             case WorldInHandNavigation::InteractionMode::PanInteraction:
-                m_navigation->panProcess(mouseEvent->pos());
+                m_navigation->panProcess(mousePos);
                 break;
             case WorldInHandNavigation::InteractionMode::RotateInteraction:
-                m_navigation->rotateProcess(mouseEvent->pos());
+                m_navigation->rotateProcess(mousePos);
                 break;
             default:
                 break;
@@ -173,14 +176,16 @@ void QtViewerMapping::mapMouseEvent(gloperate::AbstractEvent * event)
 
 void QtViewerMapping::mapWheelEvent(gloperate::AbstractEvent * event)
 {
-    auto wheelEvent = dynamic_cast<WheelEvent*>(event);
+    auto wheelEvent = dynamic_cast<WheelEvent *>(event);
     
     if (!wheelEvent)
         return;
     
+    const auto mousePos = wheelEvent->pos() * static_cast<int>(m_window->devicePixelRatio());
+    
     auto scale = wheelEvent->angleDelta().y;
     scale /= WheelEvent::defaultMouseAngleDelta();
     scale *= 0.1f; // smoother (slower) scaling
-    m_navigation->scaleAtMouse(wheelEvent->pos(), scale);
+    m_navigation->scaleAtMouse(mousePos, scale);
 }
 
