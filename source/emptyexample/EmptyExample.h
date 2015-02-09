@@ -1,17 +1,21 @@
 #pragma once
 
-#include <glm/mat4x4.hpp>
+#include <glbinding/gl/types.h>
 
 #include <globjects/base/ref_ptr.h>
-#include <globjects/Texture.h>
-#include <globjects/Buffer.h>
-#include <globjects/Program.h>
-#include <globjects/VertexArray.h>
 
 #include <gloperate/painter/Painter.h>
 
+
+namespace globjects
+{
+    class Program;
+}
+
 namespace gloperate
 {
+    class AdaptiveGrid;
+    class Icosahedron;
     class ResourceManager;
     class AbstractTargetFramebufferCapability;
     class AbstractViewportCapability;
@@ -21,11 +25,11 @@ namespace gloperate
     class AbstractVirtualTimeCapability;
 }
 
-class CubeScape : public gloperate::Painter
+class EmptyExample : public gloperate::Painter
 {
 public:
-    CubeScape(gloperate::ResourceManager & resourceManager);
-    virtual ~CubeScape();
+    EmptyExample(gloperate::ResourceManager & resourceManager);
+    virtual ~EmptyExample();
 
     void update(float delta);
 
@@ -43,11 +47,6 @@ protected:
     virtual void onTargetFramebufferChanged();
 
 protected:
-    /* parameters */
-
-    int m_numCubes;
-    bool m_animation;
-
     /* capabilities */
     gloperate::AbstractTargetFramebufferCapability * m_targetFramebufferCapability;
     gloperate::AbstractViewportCapability * m_viewportCapability;
@@ -57,17 +56,8 @@ protected:
     gloperate::AbstractVirtualTimeCapability * m_timeCapability;
 
     /* members */
-
-    gl::GLint a_vertex;
-    gl::GLint u_transform;
-    gl::GLint u_time;
-    gl::GLint u_numcubes;
-
-    globjects::ref_ptr<globjects::VertexArray> m_vao;
-    globjects::ref_ptr<globjects::Buffer> m_indices;
-    globjects::ref_ptr<globjects::Buffer> m_vertices;
-
+    globjects::ref_ptr<gloperate::AdaptiveGrid> m_grid;
+    globjects::ref_ptr<gloperate::Icosahedron> m_icosahedron;
     globjects::ref_ptr<globjects::Program> m_program;
-
-    globjects::ref_ptr<globjects::Texture> m_textures[2];
+    gl::GLint m_transformLocation;
 };

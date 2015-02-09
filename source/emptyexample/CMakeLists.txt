@@ -1,5 +1,5 @@
 
-set(target cubescape-painters)
+set(target emptyexample-painters)
 message(STATUS "Example ${target}")
 
 
@@ -36,12 +36,12 @@ set(include_path "${CMAKE_CURRENT_SOURCE_DIR}/")
 set(source_path "${CMAKE_CURRENT_SOURCE_DIR}/")
 
 set(sources
-    ${source_path}/CubeScape.cpp
+    ${source_path}/EmptyExample.cpp
     ${source_path}/plugin.cpp
 )
 
 set(api_includes
-    ${include_path}/CubeScape.h
+    ${include_path}/EmptyExample.h
 )
 
 # Group source files
