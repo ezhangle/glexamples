@@ -53,6 +53,7 @@ set(libs
 
 set(headers
     QtViewerMapping.h
+    util.hpp
 )
 
 set(sources

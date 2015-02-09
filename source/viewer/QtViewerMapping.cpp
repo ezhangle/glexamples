@@ -13,88 +13,121 @@
 #include <gloperate/navigation/WorldInHandNavigation.h>
 #include <gloperate/tools/CoordinateProvider.h>
 
+#include "util.hpp"
+
 
 using namespace gloperate;
 using namespace gloperate_qt;
 
 QtViewerMapping::QtViewerMapping(QtOpenGLWindow * window)
-    : AbstractQtMapping(window)
+:   AbstractQtMapping{window}
 {
 }
 
-QtViewerMapping::~QtViewerMapping()
-{
-}
+QtViewerMapping::~QtViewerMapping() = default;
 
 void QtViewerMapping::initializeTools()
 {
-    if (    m_painter && 
-            m_painter->supports<AbstractCameraCapability>() &&
-            m_painter->supports<AbstractViewportCapability>() &&
-            m_painter->supports<AbstractTypedRenderTargetCapability>() &&
-            m_painter->supports<AbstractProjectionCapability>())
+    if (m_painter &&
+        m_painter->supports<AbstractCameraCapability>() &&
+        m_painter->supports<AbstractViewportCapability>() &&
+        m_painter->supports<AbstractTypedRenderTargetCapability>() &&
+        m_painter->supports<AbstractProjectionCapability>())
     {
-        AbstractCameraCapability * cameraCapability = dynamic_cast<AbstractCameraCapability*>(m_painter->getCapability<AbstractCameraCapability>());
-        AbstractProjectionCapability * projectionCapability = dynamic_cast<AbstractProjectionCapability*>(m_painter->getCapability<AbstractProjectionCapability>());
-        AbstractTypedRenderTargetCapability * renderTargetCapability = dynamic_cast<AbstractTypedRenderTargetCapability*>(m_painter->getCapability<AbstractTypedRenderTargetCapability>());
-        AbstractViewportCapability * viewportCapability = dynamic_cast<AbstractViewportCapability*>(m_painter->getCapability<AbstractViewportCapability>());
-        
-        m_coordProvider.reset(new CoordinateProvider(cameraCapability, projectionCapability, viewportCapability, renderTargetCapability));
-        m_navigation.reset(new WorldInHandNavigation(*cameraCapability, *viewportCapability, *m_coordProvider));
+        auto cameraCapability = m_painter->getCapability<AbstractCameraCapability>();
+        auto projectionCapability = m_painter->getCapability<AbstractProjectionCapability>();
+        auto renderTargetCapability = m_painter->getCapability<AbstractTypedRenderTargetCapability>();
+        auto viewportCapability = m_painter->getCapability<AbstractViewportCapability>();
+
+        m_coordProvider = make_unique<CoordinateProvider>(
+            cameraCapability,
+            projectionCapability,
+            viewportCapability,
+            renderTargetCapability);
+
+        m_navigation = make_unique<WorldInHandNavigation>(
+            *cameraCapability,
+            *viewportCapability,
+            *m_coordProvider);
     }
 }
 
 void QtViewerMapping::mapEvent(AbstractEvent * event)
 {
-    if (event->sourceType() == gloperate::SourceType::Keyboard)
+    switch (event->sourceType())
     {
-        KeyboardEvent * keyEvent = dynamic_cast<KeyboardEvent*>(event);
-        if (keyEvent && keyEvent->type() == KeyboardEvent::Type::Press)
-        {
-            switch (keyEvent->key())
-            {
-            // WASD move camera
-            case KeyW:
-                m_navigation->pan(glm::vec3(0, 0, 1));
-                break;
-            case KeyA:
-                m_navigation->pan(glm::vec3(1, 0, 0));
-                break;
-            case KeyS:
-                m_navigation->pan(glm::vec3(0, 0, -1));
-                break;
-            case KeyD:
-                m_navigation->pan(glm::vec3(-1, 0, 0));
-                break;
-            // Reset camera position
-            case KeyR:
-                m_navigation->reset();
-                break;
-            // Arrows rotate camera
-            case KeyUp:
-                m_navigation->rotate(0.0f, glm::radians(-10.0f));
-                break;
-            case KeyLeft:
-                m_navigation->rotate(glm::radians(10.0f), 0.0f);
-                break;
-            case KeyDown:
-                m_navigation->rotate(0.0f, glm::radians(10.0f));
-                break;
-            case KeyRight:
-                m_navigation->rotate(glm::radians(-10.0f), 0.0f);
-                break;
-            default:
-                break;
-            }
-        }
+        case SourceType::Keyboard:
+            mapKeyboardEvent(event);
+            break;
+        case SourceType::Mouse:
+            mapMouseEvent(event);
+            break;
+        case SourceType::Wheel:
+            mapWheelEvent(event);
+            break;
+        default:
+            break;
     }
-    else if (event->sourceType() == gloperate::SourceType::Mouse)
+}
+
+void QtViewerMapping::mapKeyboardEvent(gloperate::AbstractEvent * event)
+{
+    const auto keyEvent = dynamic_cast<KeyboardEvent * >(event);
+    
+    if (!keyEvent)
+        return;
+    
+    if (keyEvent->type() != KeyboardEvent::Type::Press)
+        return;
+
+    switch (keyEvent->key())
     {
-        MouseEvent * mouseEvent = dynamic_cast<MouseEvent*>(event);
-        if (mouseEvent && mouseEvent->type() == MouseEvent::Type::Press)
+            // WASD move camera
+        case KeyW:
+            m_navigation->pan(glm::vec3(0, 0, 1));
+            break;
+        case KeyA:
+            m_navigation->pan(glm::vec3(1, 0, 0));
+            break;
+        case KeyS:
+            m_navigation->pan(glm::vec3(0, 0, -1));
+            break;
+        case KeyD:
+            m_navigation->pan(glm::vec3(-1, 0, 0));
+            break;
+            // Reset camera position
+        case KeyR:
+            m_navigation->reset();
+            break;
+            // Arrows rotate camera
+        case KeyUp:
+            m_navigation->rotate(0.0f, glm::radians(-10.0f));
+            break;
+        case KeyLeft:
+            m_navigation->rotate(glm::radians(10.0f), 0.0f);
+            break;
+        case KeyDown:
+            m_navigation->rotate(0.0f, glm::radians(10.0f));
+            break;
+        case KeyRight:
+            m_navigation->rotate(glm::radians(-10.0f), 0.0f);
+            break;
+        default:
+            break;
+    }
+}
+
+void QtViewerMapping::mapMouseEvent(gloperate::AbstractEvent * event)
+{
+    const auto mouseEvent = dynamic_cast<MouseEvent*>(event);
+    
+    if (!mouseEvent)
+        return;
+    
+    if (mouseEvent->type() == MouseEvent::Type::Press)
+    {
+        switch (mouseEvent->button())
         {
-            switch (mouseEvent->button())
-            {
             case MouseButtonMiddle:
                 m_navigation->reset();
                 break;
@@ -106,12 +139,12 @@ void QtViewerMapping::mapEvent(AbstractEvent * event)
                 break;
             default:
                 break;
-            }
         }
-        else if (mouseEvent && mouseEvent->type() == MouseEvent::Type::Move)
+    }
+    else if (mouseEvent->type() == MouseEvent::Type::Move)
+    {
+        switch (m_navigation->mode())
         {
-            switch (m_navigation->mode())
-            {
             case WorldInHandNavigation::InteractionMode::PanInteraction:
                 m_navigation->panProcess(mouseEvent->pos());
                 break;
@@ -120,12 +153,12 @@ void QtViewerMapping::mapEvent(AbstractEvent * event)
                 break;
             default:
                 break;
-            }
         }
-        else if (mouseEvent && mouseEvent->type() == MouseEvent::Type::Release)
+    }
+    else if (mouseEvent->type() == MouseEvent::Type::Release)
+    {
+        switch (mouseEvent->button())
         {
-            switch (mouseEvent->button())
-            {
             case MouseButtonLeft:
                 m_navigation->panEnd();
                 break;
@@ -134,19 +167,20 @@ void QtViewerMapping::mapEvent(AbstractEvent * event)
                 break;
             default:
                 break;
-            }
-        }
-    } 
-    else if (event->sourceType() == gloperate::SourceType::Wheel)
-    {
-        WheelEvent * wheelEvent = dynamic_cast<WheelEvent*>(event);
-        if (wheelEvent)
-        {
-            auto scale = wheelEvent->angleDelta().y;
-            scale /= WheelEvent::defaultMouseAngleDelta();
-            scale *= 0.1f; // smoother (slower) scaling
-            m_navigation->scaleAtMouse(wheelEvent->pos(), scale);
         }
     }
+}
+
+void QtViewerMapping::mapWheelEvent(gloperate::AbstractEvent * event)
+{
+    auto wheelEvent = dynamic_cast<WheelEvent*>(event);
+    
+    if (!wheelEvent)
+        return;
+    
+    auto scale = wheelEvent->angleDelta().y;
+    scale /= WheelEvent::defaultMouseAngleDelta();
+    scale *= 0.1f; // smoother (slower) scaling
+    m_navigation->scaleAtMouse(wheelEvent->pos(), scale);
 }
 

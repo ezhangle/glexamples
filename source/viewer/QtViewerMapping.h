@@ -1,10 +1,12 @@
 #pragma once
 
-#include <gloperate-qt/AbstractQtMapping.h>
-
 #include <memory>
 
-namespace gloperate {
+#include <gloperate-qt/AbstractQtMapping.h>
+
+
+namespace gloperate
+{
     class CoordinateProvider;
     class WorldInHandNavigation;
 }
@@ -19,6 +21,11 @@ public:
 
 protected:
     virtual void mapEvent(gloperate::AbstractEvent * event) override;
+
+private:
+    void mapKeyboardEvent(gloperate::AbstractEvent * event);
+    void mapMouseEvent(gloperate::AbstractEvent * event);
+    void mapWheelEvent(gloperate::AbstractEvent * event);
 
 protected:
     std::unique_ptr<gloperate::WorldInHandNavigation> m_navigation;
