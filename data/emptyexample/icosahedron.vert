@@ -6,10 +6,10 @@ layout(location = 1) in vec3 a_normal;
 
 out vec3 v_normal;
 
-uniform mat4 modelViewProjection;
+uniform mat4 transform;
 
 void main()
 {
-	gl_Position = modelViewProjection * vec4(a_vertex, 1.0);
+	gl_Position = transform * vec4(a_vertex, 1.0);
     v_normal = a_normal;
 }

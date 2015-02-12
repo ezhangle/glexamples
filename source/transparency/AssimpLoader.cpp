@@ -81,7 +81,8 @@ aiScene * AssimpLoader::load(const std::string & filename, std::function<void(in
         filename.c_str(),
         aiProcess_Triangulate           |
         aiProcess_JoinIdenticalVertices |
-        aiProcess_SortByPType);
+        aiProcess_SortByPType |
+        aiProcess_GenNormals);
 
     if (scene == nullptr)
         std::cout << aiGetErrorString();

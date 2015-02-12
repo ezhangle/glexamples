@@ -40,6 +40,7 @@ set(source_path "${CMAKE_CURRENT_SOURCE_DIR}/")
 set(sources
     ${source_path}/AssimpLoader.cpp
     ${source_path}/AssimpProcessing.cpp
+    ${source_path}/PolygonalDrawable.cpp
     ${source_path}/PolygonalGeometry.cpp
     ${source_path}/screendoor/ScreenDoor.cpp
     ${source_path}/plugin.cpp
@@ -48,7 +49,9 @@ set(sources
 set(api_includes
     ${include_path}/AssimpLoader.h
     ${include_path}/AssimpProcessing.h
+    ${include_path}/PolygonalDrawable.h
     ${include_path}/PolygonalGeometry.h
+    ${include_path}/util.hpp
     ${include_path}/screendoor/ScreenDoor.h
 )
 

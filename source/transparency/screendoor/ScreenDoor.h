@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <glbinding/gl/types.h>
 
 #include <globjects/base/ref_ptr.h>
@@ -25,6 +27,9 @@ namespace gloperate
     class AbstractVirtualTimeCapability;
 }
 
+
+class PolygonalDrawable;
+
 class ScreenDoor : public gloperate::Painter
 {
 public:
@@ -39,6 +44,9 @@ protected:
     virtual void onTargetFramebufferChanged();
 
 protected:
+    void setupDrawable();
+
+protected:
     /* capabilities */
     gloperate::AbstractTargetFramebufferCapability * m_targetFramebufferCapability;
     gloperate::AbstractViewportCapability * m_viewportCapability;
@@ -49,7 +57,7 @@ protected:
 
     /* members */
     globjects::ref_ptr<gloperate::AdaptiveGrid> m_grid;
-    globjects::ref_ptr<gloperate::Icosahedron> m_icosahedron;
     globjects::ref_ptr<globjects::Program> m_program;
     gl::GLint m_transformLocation;
+    std::unique_ptr<PolygonalDrawable> m_drawable;
 };

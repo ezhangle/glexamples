@@ -1,7 +1,11 @@
 #include "ScreenDoor.h"
 
+#include <iostream>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <assimp/cimport.h>
 
 #include <glbinding/gl/enum.h>
 #include <glbinding/gl/bitfield.h>
@@ -20,6 +24,13 @@
 
 #include <gloperate/primitives/AdaptiveGrid.h>
 #include <gloperate/primitives/Icosahedron.h>
+
+#include "../AssimpLoader.h"
+#include "../AssimpProcessing.h"
+#include "../PolygonalDrawable.h"
+#include "../PolygonalGeometry.h"
+#include "../util.hpp"
+
 
 using namespace gl;
 using namespace glm;
@@ -52,7 +63,7 @@ ScreenDoor::~ScreenDoor()
 
 void ScreenDoor::setupProjection()
 {
-    static const auto zNear = 0.3f, zFar = 15.f, fovy = 50.f;
+    static const auto zNear = 0.3f, zFar = 30.f, fovy = 50.f;
 
     m_projectionCapability->setZNear(zNear);
     m_projectionCapability->setZFar(zFar);
@@ -78,7 +89,7 @@ void ScreenDoor::onInitialize()
     m_grid = new gloperate::AdaptiveGrid{};
     m_grid->setColor({0.6f, 0.6f, 0.6f});
 
-    m_icosahedron = new gloperate::Icosahedron{3};
+    setupDrawable();
 
     m_program = new Program{};
     m_program->attach(
@@ -86,7 +97,7 @@ void ScreenDoor::onInitialize()
         Shader::fromFile(GL_FRAGMENT_SHADER, "data/emptyexample/icosahedron.frag")
     );
 
-    m_transformLocation = m_program->getUniformLocation("modelViewProjection");
+    m_transformLocation = m_program->getUniformLocation("transform");
 
     glClearColor(0.85f, 0.87f, 0.91f, 1.0f);
 
@@ -126,7 +137,7 @@ void ScreenDoor::onPaint()
     m_program->use();
     m_program->setUniform(m_transformLocation, transform);
 
-    m_icosahedron->draw();
+    m_drawable->draw();
 
     m_program->release();
 
@@ -142,4 +153,27 @@ void ScreenDoor::onTargetFramebufferChanged()
 
     m_typedRenderTargetCapability->setRenderTarget(gloperate::RenderTargetType::Depth, fbo,
         GLenum::GL_DEPTH_ATTACHMENT, GLenum::GL_DEPTH_COMPONENT);
+}
+
+void ScreenDoor::setupDrawable()
+{
+    auto assimpLoader = AssimpLoader{};
+    const auto scene = assimpLoader.load("data/screendoor/dragon.obj", {});
+
+    if (!scene)
+    {
+        std::cout << "Could not load dragon.obj" << std::endl;
+        return;
+    }
+
+    const auto geometries = AssimpProcessing::convertToGeometries(scene);
+
+    aiReleaseImport(scene);
+
+    if (geometries.size() > 1)
+    {
+        std::cout << "Warning: More than one geometry in scene" << std::endl;
+    }
+
+    m_drawable = make_unique<PolygonalDrawable>(geometries.at(0));
 }

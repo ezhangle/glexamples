@@ -37,7 +37,7 @@ PolygonalGeometry AssimpProcessing::convertToGeometry(const aiMesh * mesh)
     for (auto i = 0u; i < mesh->mNumVertices; ++i)
     {
         const auto & vertex = mesh->mVertices[i];
-        vertices.push_back({ vertex.x, vertex.y, vertex.y });
+        vertices.push_back({ vertex.x, vertex.y, vertex.z });
     }
     geometry.setVertices(std::move(vertices));
 
@@ -47,7 +47,7 @@ PolygonalGeometry AssimpProcessing::convertToGeometry(const aiMesh * mesh)
         for (auto i = 0u; i < mesh->mNumVertices; ++i)
         {
             const auto & normal = mesh->mNormals[i];
-            normals.push_back({ normal.x, normal.y, normal.y });
+            normals.push_back({ normal.x, normal.y, normal.z });
         }
         geometry.setNormals(std::move(normals));
     }

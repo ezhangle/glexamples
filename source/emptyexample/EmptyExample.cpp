@@ -86,7 +86,7 @@ void EmptyExample::onInitialize()
         Shader::fromFile(GL_FRAGMENT_SHADER, "data/emptyexample/icosahedron.frag")
     );
 
-    m_transformLocation = m_program->getUniformLocation("modelViewProjection");
+    m_transformLocation = m_program->getUniformLocation("transform");
 
     glClearColor(0.85f, 0.87f, 0.91f, 1.0f);
 
