@@ -27,7 +27,6 @@ namespace gloperate
     class AbstractVirtualTimeCapability;
 }
 
-
 class PolygonalDrawable;
 
 class ScreenDoor : public gloperate::Painter
@@ -36,14 +35,14 @@ public:
     ScreenDoor(gloperate::ResourceManager & resourceManager);
     virtual ~ScreenDoor();
 
+protected:
+    virtual void onInitialize() override;
+    virtual void onPaint() override;
+    
+    void onTargetFramebufferChanged();
+
+protected:
     void setupProjection();
-
-protected:
-    virtual void onInitialize();
-    virtual void onPaint();
-    virtual void onTargetFramebufferChanged();
-
-protected:
     void setupDrawable();
 
 protected:

@@ -47,7 +47,7 @@ ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
 {
     m_timeCapability->setLoopDuration(20.0f * pi<float>());
 
-    m_targetFramebufferCapability->changed.connect([this](){ this->onTargetFramebufferChanged();});
+    m_targetFramebufferCapability->changed.connect(this, &ScreenDoor::onTargetFramebufferChanged);
 
     addCapability(m_targetFramebufferCapability);
     addCapability(m_viewportCapability);
@@ -74,8 +74,6 @@ void ScreenDoor::setupProjection()
 
 void ScreenDoor::onInitialize()
 {
-    // create program
-
     globjects::init();
     onTargetFramebufferChanged();
 
@@ -93,9 +91,8 @@ void ScreenDoor::onInitialize()
 
     m_program = new Program{};
     m_program->attach(
-        Shader::fromFile(GL_VERTEX_SHADER, "data/emptyexample/icosahedron.vert"),
-        Shader::fromFile(GL_FRAGMENT_SHADER, "data/emptyexample/icosahedron.frag")
-    );
+        Shader::fromFile(GL_VERTEX_SHADER, "data/screendoor/screendoor.vert"),
+        Shader::fromFile(GL_FRAGMENT_SHADER, "data/screendoor/screendoor.frag"));
 
     m_transformLocation = m_program->getUniformLocation("transform");
 
@@ -162,7 +159,7 @@ void ScreenDoor::setupDrawable()
 
     if (!scene)
     {
-        std::cout << "Could not load dragon.obj" << std::endl;
+        std::cout << "Could not load file" << std::endl;
         return;
     }
 
