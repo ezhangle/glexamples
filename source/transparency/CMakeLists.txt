@@ -1,11 +1,17 @@
 
 set(target transparency-painters)
-message(STATUS "Example ${target}")
 
 
 # External libraries
 
-find_package(ASSIMP REQUIRED)
+find_package(ASSIMP QUIET)
+
+if (NOT ASSIMP_FOUND)
+	message("Example ${target} skipped: ASSIMP not found")
+	return()
+endif()
+
+message(STATUS "Example ${target}")
 
 # Includes
 
