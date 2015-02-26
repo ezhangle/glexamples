@@ -1,4 +1,4 @@
-#include "ScreenDoor.h"
+#include "Stochastic.h"
 
 #include <iostream>
 
@@ -35,7 +35,7 @@ using namespace gl;
 using namespace glm;
 using namespace globjects;
 
-ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
+Stochastic::Stochastic(gloperate::ResourceManager & resourceManager)
 :   Painter{resourceManager}
 ,   m_targetFramebufferCapability{new gloperate::TargetFramebufferCapability}
 ,   m_viewportCapability{new gloperate::ViewportCapability}
@@ -46,7 +46,7 @@ ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
 {
     m_timeCapability->setLoopDuration(20.0f * pi<float>());
 
-    m_targetFramebufferCapability->changed.connect(this, &ScreenDoor::onTargetFramebufferChanged);
+    m_targetFramebufferCapability->changed.connect(this, &Stochastic::onTargetFramebufferChanged);
 
     addCapability(m_targetFramebufferCapability);
     addCapability(m_viewportCapability);
@@ -56,11 +56,11 @@ ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
     addCapability(m_typedRenderTargetCapability);
 }
 
-ScreenDoor::~ScreenDoor()
+Stochastic::~Stochastic()
 {
 }
 
-void ScreenDoor::setupProjection()
+void Stochastic::setupProjection()
 {
     static const auto zNear = 0.3f, zFar = 30.f, fovy = 50.f;
 
@@ -71,7 +71,7 @@ void ScreenDoor::setupProjection()
     m_grid->setNearFar(zNear, zFar);
 }
 
-void ScreenDoor::onInitialize()
+void Stochastic::onInitialize()
 {
     globjects::init();
     onTargetFramebufferChanged();
@@ -90,8 +90,8 @@ void ScreenDoor::onInitialize()
 
     m_program = new Program{};
     m_program->attach(
-        Shader::fromFile(GL_VERTEX_SHADER, "data/transparency/screendoor.vert"),
-        Shader::fromFile(GL_FRAGMENT_SHADER, "data/transparency/screendoor.frag"));
+        Shader::fromFile(GL_VERTEX_SHADER, "data/transparency/stochastic.vert"),
+        Shader::fromFile(GL_FRAGMENT_SHADER, "data/transparency/stochastic.frag"));
 
     m_transformLocation = m_program->getUniformLocation("transform");
 
@@ -100,7 +100,7 @@ void ScreenDoor::onInitialize()
     setupProjection();
 }
 
-void ScreenDoor::onPaint()
+void Stochastic::onPaint()
 {
     if (m_viewportCapability->hasChanged())
     {
@@ -130,6 +130,9 @@ void ScreenDoor::onPaint()
     m_grid->update(eye, transform);
     m_grid->draw();
 
+    glEnable(GL_SAMPLE_SHADING);
+    glMinSampleShading(1);
+
     m_program->use();
     m_program->setUniform(m_transformLocation, transform);
 
@@ -140,7 +143,7 @@ void ScreenDoor::onPaint()
     Framebuffer::unbind(GL_FRAMEBUFFER);
 }
 
-void ScreenDoor::onTargetFramebufferChanged()
+void Stochastic::onTargetFramebufferChanged()
 {
     auto fbo = m_targetFramebufferCapability->framebuffer();
 
@@ -151,10 +154,10 @@ void ScreenDoor::onTargetFramebufferChanged()
         GLenum::GL_DEPTH_ATTACHMENT, GLenum::GL_DEPTH_COMPONENT);
 }
 
-void ScreenDoor::setupDrawable()
+void Stochastic::setupDrawable()
 {
     auto assimpLoader = AssimpLoader{};
-    const auto scene = assimpLoader.load("data/transparency/dragon.obj", {});
+    const auto scene = assimpLoader.load("data/screendoor/dragon.obj", {});
 
     if (!scene)
     {

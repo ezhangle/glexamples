@@ -17,6 +17,7 @@ namespace globjects
 namespace gloperate
 {
     class AdaptiveGrid;
+    class Icosahedron;
     class ResourceManager;
     class AbstractTargetFramebufferCapability;
     class AbstractViewportCapability;
@@ -28,11 +29,11 @@ namespace gloperate
 
 class PolygonalDrawable;
 
-class ScreenDoor : public gloperate::Painter
+class Stochastic : public gloperate::Painter
 {
 public:
-    ScreenDoor(gloperate::ResourceManager & resourceManager);
-    virtual ~ScreenDoor();
+    Stochastic(gloperate::ResourceManager & resourceManager);
+    virtual ~Stochastic();
 
 protected:
     virtual void onInitialize() override;

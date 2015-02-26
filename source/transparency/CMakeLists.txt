@@ -42,8 +42,9 @@ set(sources
     ${source_path}/AssimpProcessing.cpp
     ${source_path}/PolygonalDrawable.cpp
     ${source_path}/PolygonalGeometry.cpp
-    ${source_path}/screendoor/ScreenDoor.cpp
     ${source_path}/plugin.cpp
+    ${source_path}/screendoor/ScreenDoor.cpp
+    ${source_path}/stochastic/Stochastic.cpp
 )
 
 set(api_includes
@@ -53,6 +54,7 @@ set(api_includes
     ${include_path}/PolygonalGeometry.h
     ${include_path}/util.hpp
     ${include_path}/screendoor/ScreenDoor.h
+    ${include_path}/stochastic/Stochastic.h
 )
 
 # Group source files
