@@ -174,11 +174,13 @@ void ScreenDoor::onPaint()
     
     m_program->use();
     m_program->setUniform(m_transformLocation, transform);
-    m_program->setUniform(m_transparencyLocation, m_transparency);
-
-    for (auto & drawable : m_drawables)
-        drawable->draw();
-
+    
+    for (auto i = 0u; i < m_drawables.size(); ++i)
+    {
+        m_program->setUniform(m_transparencyLocation, i % 2 == 0 ? m_transparency : 1.0f);
+        m_drawables[i]->draw();
+    }
+    
     m_program->release();
     
     glDisable(GL_MIN_SAMPLE_SHADING_VALUE);
@@ -201,7 +203,8 @@ void ScreenDoor::onPaint()
         drawBuffer = GL_BACK_LEFT;
     }
     
-    m_fbo->blit(GL_COLOR_ATTACHMENT0, rect, targetfbo, drawBuffer, rect, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    m_fbo->blit(GL_COLOR_ATTACHMENT0, rect, targetfbo, drawBuffer, rect,
+        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
 
 void ScreenDoor::onTargetFramebufferChanged()
