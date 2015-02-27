@@ -11,6 +11,7 @@ find_package(GLM REQUIRED)
 find_package(GLBinding REQUIRED)
 find_package(GLObjects REQUIRED)
 find_package(GLOperate REQUIRED)
+find_package(Libzeug REQUIRED)
 
 # Include directories
 include_directories(
@@ -20,12 +21,14 @@ include_directories(
     ${GLBINDING_INCLUDES}
     ${GLOBJECTS_INCLUDES}
     ${GLOPERATE_INCLUDES}
+    ${LIBZEUG_INCLUDES}
 )
 
 set(GLEXAMPLES_DEPENDENCY_LIBRARIES
     ${GLBINDING_LIBRARIES}
     ${GLOBJECTS_LIBRARIES}
     ${GLOPERATE_LIBRARIES}
+    ${LIBZEUG_LIBRARIES}
 )
 
 # Applications

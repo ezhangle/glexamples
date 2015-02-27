@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <glbinding/gl/types.h>
 
@@ -11,7 +12,9 @@
 
 namespace globjects
 {
+    class Framebuffer;
     class Program;
+    class Texture;
 }
 
 namespace gloperate
@@ -33,7 +36,18 @@ class ScreenDoor : public gloperate::Painter
 public:
     ScreenDoor(gloperate::ResourceManager & resourceManager);
     virtual ~ScreenDoor();
-
+    
+    virtual reflectionzeug::PropertyGroup * propertyGroup() const override;
+    
+public:
+    void setupPropertyGroup();
+    
+    bool multisampling() const;
+    void setMultisampling(bool b);
+    
+    float transparency() const;
+    void setTransparency(float transparency);
+    
 protected:
     virtual void onInitialize() override;
     virtual void onPaint() override;
@@ -41,8 +55,11 @@ protected:
     void onTargetFramebufferChanged();
 
 protected:
+    void setupFramebuffer();
     void setupProjection();
     void setupDrawable();
+    void setupProgram();
+    void updateFramebuffer();
 
 protected:
     /* capabilities */
@@ -54,8 +71,18 @@ protected:
     gloperate::AbstractVirtualTimeCapability * m_timeCapability;
 
     /* members */
+    globjects::ref_ptr<globjects::Framebuffer> m_fbo;
+    globjects::ref_ptr<globjects::Texture> m_colorAttachment;
+    globjects::ref_ptr<globjects::Texture> m_depthAttachment;
+    
     globjects::ref_ptr<gloperate::AdaptiveGrid> m_grid;
     globjects::ref_ptr<globjects::Program> m_program;
     gl::GLint m_transformLocation;
-    std::unique_ptr<PolygonalDrawable> m_drawable;
+    gl::GLint m_transparencyLocation;
+    std::vector<std::unique_ptr<PolygonalDrawable>> m_drawables;
+    
+    std::unique_ptr<reflectionzeug::PropertyGroup> m_propertyGroup;
+    bool m_multisampling;
+    bool m_multisamplingChanged;
+    float m_transparency;
 };

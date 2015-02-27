@@ -1,5 +1,11 @@
-
 #include <iostream>
+
+#include <QApplication>
+#include <QCoreApplication>
+#include <QDesktopWidget>
+#include <QDockWidget>
+#include <QString>
+#include <QMainWindow>
 
 #include <globjects/base/baselogging.h>
 
@@ -19,11 +25,7 @@
 #include <gloperate-qt/QtMouseEventProvider.h>
 #include <gloperate-qt/QtWheelEventProvider.h>
 
-#include <QApplication>
-#include <QCoreApplication>
-#include <QDesktopWidget>
-#include <QString>
-#include <QMainWindow>
+#include <propertyguizeug/PropertyBrowser.h>
 
 #include "QtViewerMapping.h"
 
@@ -99,6 +101,15 @@ int main(int argc, char * argv[])
     mainWindow.setGeometry((rect.width() - 1280) / 2, (rect.height() - 720) / 2, 1280, 720);
     mainWindow.setCentralWidget(QWidget::createWindowContainer(window));
     mainWindow.centralWidget()->setFocusPolicy(Qt::StrongFocus);
+
+    if (painter->propertyGroup())
+    {
+        auto dockWidget = new QDockWidget{};
+        auto propertyBrowser = new propertyguizeug::PropertyBrowser{painter->propertyGroup()};
+        
+        dockWidget->setWidget(propertyBrowser);
+        mainWindow.addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+    }
 
     mainWindow.show();
 

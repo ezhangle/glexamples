@@ -15,6 +15,8 @@
 #include <globjects/DebugMessage.h>
 #include <globjects/Program.h>
 
+#include <gloperate/base/RenderTargetType.h>
+
 #include <gloperate/painter/TargetFramebufferCapability.h>
 #include <gloperate/painter/ViewportCapability.h>
 #include <gloperate/painter/PerspectiveProjectionCapability.h>
@@ -60,6 +62,11 @@ Stochastic::~Stochastic()
 {
 }
 
+reflectionzeug::PropertyGroup * Stochastic::propertyGroup() const
+{
+    return nullptr;
+}
+
 void Stochastic::setupProjection()
 {
     static const auto zNear = 0.3f, zFar = 30.f, fovy = 50.f;
@@ -90,8 +97,8 @@ void Stochastic::onInitialize()
 
     m_program = new Program{};
     m_program->attach(
-        Shader::fromFile(GL_VERTEX_SHADER, "data/transparency/stochastic.vert"),
-        Shader::fromFile(GL_FRAGMENT_SHADER, "data/transparency/stochastic.frag"));
+        Shader::fromFile(GL_VERTEX_SHADER, "data/transparency/screendoor.vert"),
+        Shader::fromFile(GL_FRAGMENT_SHADER, "data/transparency/screendoor.frag"));
 
     m_transformLocation = m_program->getUniformLocation("transform");
 
@@ -124,19 +131,20 @@ void Stochastic::onPaint()
 
     glEnable(GL_DEPTH_TEST);
 
-    const auto transform = m_projectionCapability->projection() * m_cameraCapability->view();
+    const auto projectionView =
+        m_projectionCapability->projection() * m_cameraCapability->view();
     const auto eye = m_cameraCapability->eye();
 
-    m_grid->update(eye, transform);
+    m_grid->update(eye, projectionView);
     m_grid->draw();
 
-    glEnable(GL_SAMPLE_SHADING);
-    glMinSampleShading(1);
+    const auto modelViewProjection = glm::scale(projectionView, glm::vec3{0.03f});
 
     m_program->use();
-    m_program->setUniform(m_transformLocation, transform);
+    m_program->setUniform(m_transformLocation, modelViewProjection);
 
-    m_drawable->draw();
+    for (auto & drawable : m_drawables)
+        drawable->draw();
 
     m_program->release();
 
@@ -157,7 +165,7 @@ void Stochastic::onTargetFramebufferChanged()
 void Stochastic::setupDrawable()
 {
     auto assimpLoader = AssimpLoader{};
-    const auto scene = assimpLoader.load("data/screendoor/dragon.obj", {});
+    const auto scene = assimpLoader.load("data/transparency/transparency_scene.obj", {});
 
     if (!scene)
     {
@@ -169,10 +177,6 @@ void Stochastic::setupDrawable()
 
     aiReleaseImport(scene);
 
-    if (geometries.size() > 1)
-    {
-        std::cout << "Warning: More than one geometry in scene" << std::endl;
-    }
-
-    m_drawable = make_unique<PolygonalDrawable>(geometries.at(0));
+    for (const auto & geometry : geometries)
+        m_drawables.push_back(make_unique<PolygonalDrawable>(geometry));
 }

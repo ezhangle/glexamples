@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <glbinding/gl/types.h>
 
@@ -17,7 +18,6 @@ namespace globjects
 namespace gloperate
 {
     class AdaptiveGrid;
-    class Icosahedron;
     class ResourceManager;
     class AbstractTargetFramebufferCapability;
     class AbstractViewportCapability;
@@ -40,6 +40,8 @@ protected:
     virtual void onPaint() override;
 
     void onTargetFramebufferChanged();
+    
+    virtual reflectionzeug::PropertyGroup * propertyGroup() const override;
 
 protected:
     void setupProjection();
@@ -58,5 +60,5 @@ protected:
     globjects::ref_ptr<gloperate::AdaptiveGrid> m_grid;
     globjects::ref_ptr<globjects::Program> m_program;
     gl::GLint m_transformLocation;
-    std::unique_ptr<PolygonalDrawable> m_drawable;
+    std::vector<std::unique_ptr<PolygonalDrawable>> m_drawables;
 };

@@ -66,6 +66,8 @@ set(sources
 
 add_executable(${target} ${headers} ${sources})
 
+add_dependencies(${target} transparency-painters)
+
 target_link_libraries(${target} ${libs})
 
 
