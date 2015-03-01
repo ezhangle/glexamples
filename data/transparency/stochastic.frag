@@ -5,24 +5,30 @@ in vec3 v_normal;
 
 out vec4 fragColor;
 
-uniform float transparency;
+uniform uint transparency;
+uniform vec2 viewport;
+uniform usampler2D masks;
+
+highp float rand(vec2 co)
+{
+    highp float a = 12.9898;
+    highp float b = 78.233;
+    highp float c = 43758.5453;
+    highp float dt= dot(co.xy ,vec2(a,b));
+    highp float sn= mod(dt,3.14);
+    return fract(sin(sn) * c);
+}
 
 void main()
 {
-    float[] thresholdMatrix = float[16](
-        1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
-        13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
-        4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
-        16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
-    );
+    vec2 normFragCoord = gl_FragCoord.xy / viewport;
+    ivec2 index = ivec2(rand(vec2(normFragCoord.x, gl_FragCoord.z)) * 1023, transparency);
+    uint mask = texelFetch(masks, index, 0).r;
 
-    ivec2 fragCoord = ivec2(mod(floor(gl_FragCoord.xy), 2));
-    ivec2 sampleCoord = ivec2((gl_SampleID / 2), mod(gl_SampleID, 2));
-    int index = (fragCoord.y * 2 + sampleCoord.y) * 4 + (fragCoord.x * 2 + sampleCoord.x);
-    float threshold = thresholdMatrix[index];
-
-    if (threshold > transparency)
+    uint sampleBit = uint(1) << gl_SampleID;
+    if ((mask & sampleBit) != sampleBit)
         discard;
 
-    fragColor = vec4(v_normal * 0.5 + 0.5, 1.0);
+    fragColor = vec4(vec3(v_normal * 0.5 + 0.5), 1.0);
+    // fragColor = vec4(vec3(mask / 255.0), 1.0);
 }

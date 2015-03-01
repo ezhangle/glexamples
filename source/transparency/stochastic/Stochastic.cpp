@@ -52,7 +52,7 @@ Stochastic::Stochastic(gloperate::ResourceManager & resourceManager)
 ,   m_typedRenderTargetCapability{new gloperate::TypedRenderTargetCapability{}}
 ,   m_cameraCapability{new gloperate::CameraCapability{}}
 ,   m_timeCapability{new gloperate::VirtualTimeCapability}
-,   m_transparency{0.5}
+,   m_transparency{127}
 {
     m_timeCapability->setLoopDuration(20.0f * pi<float>());
 
@@ -79,20 +79,19 @@ void Stochastic::setupPropertyGroup()
 {
     m_propertyGroup = make_unique<reflectionzeug::PropertyGroup>();
     
-    m_propertyGroup->addProperty<float>("transparency", this,
+    m_propertyGroup->addProperty<unsigned char>("transparency", this,
         &Stochastic::transparency, &Stochastic::setTransparency)->setOptions({
-        { "minimum", 0.0f },
-        { "maximum", 1.0f },
-        { "step", 0.1f },
-        { "precision", 1u }});
+        { "minimum", 0 },
+        { "maximum", 255 },
+        { "step", 1 }});
 }
 
-float Stochastic::transparency() const
+unsigned char Stochastic::transparency() const
 {
     return m_transparency;
 }
 
-void Stochastic::setTransparency(float transparency)
+void Stochastic::setTransparency(unsigned char transparency)
 {
     m_transparency = transparency;
 }
@@ -132,6 +131,8 @@ void Stochastic::onPaint()
 
         m_viewportCapability->setChanged(false);
         
+        m_program->setUniform(m_viewportLocation, glm::vec2{m_viewportCapability->width(), m_viewportCapability->height()});
+        
         updateFramebuffer();
     }
 
@@ -150,19 +151,18 @@ void Stochastic::onPaint()
     glEnable(GL_MIN_SAMPLE_SHADING_VALUE);
     glMinSampleShading(1.0);
     
+    m_masksTexture->bindActive(GL_TEXTURE0);
+    
     m_program->use();
     m_program->setUniform(m_transformLocation, transform);
+    m_program->setUniform(m_transparencyLocation, static_cast<unsigned int>(m_transparency));
     
-    for (auto i = 0u; i < m_drawables.size(); ++i)
-    {
-        m_program->setUniform(m_transparencyLocation, i % 2 == 0 ? m_transparency : 1.0f);
-        m_drawables[i]->draw();
-    }
+    for (auto & drawable : m_drawables)
+        drawable->draw();
     
     m_program->release();
     
     glDisable(GL_MIN_SAMPLE_SHADING_VALUE);
-    glMinSampleShading(0.0);
 
     Framebuffer::unbind(GL_FRAMEBUFFER);
     
@@ -200,7 +200,7 @@ void Stochastic::setupFramebuffer()
 {
     m_colorAttachment = Texture::createDefault(GL_TEXTURE_2D_MULTISAMPLE);
     m_depthAttachment = Texture::createDefault(GL_TEXTURE_2D_MULTISAMPLE);
-    
+
     m_fbo = make_ref<Framebuffer>();
 
     m_fbo->attachTexture(GL_COLOR_ATTACHMENT0, m_colorAttachment);
@@ -258,6 +258,7 @@ void Stochastic::setupProgram()
     
     m_transformLocation = m_program->getUniformLocation("transform");
     m_transparencyLocation = m_program->getUniformLocation("transparency");
+    m_viewportLocation = m_program->getUniformLocation("viewport");
 }
 
 void Stochastic::setupMasksTexture()
@@ -266,12 +267,13 @@ void Stochastic::setupMasksTexture()
     const auto table = MasksTableGenerator::generateDistributions(numSamples);
     
     m_masksTexture = Texture::createDefault(GL_TEXTURE_2D);
-    m_masksTexture->image2D(0, GL_R8, table->size(), table->at(0).size(), 0, GL_RED, GL_UNSIGNED_BYTE, table->data());
+    m_masksTexture->image2D(0, GL_R8UI, table->at(0).size(), table->size(), 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, table->data());
+    // ToDo: continue here ...
 }
 
 void Stochastic::updateFramebuffer()
 {
-    static const auto numSamples = 4u;
+    static const auto numSamples = 8u;
     const auto width = m_viewportCapability->width(), height = m_viewportCapability->height();
     
     m_colorAttachment->image2DMultisample(numSamples, GL_RGBA8, width, height, GL_TRUE);

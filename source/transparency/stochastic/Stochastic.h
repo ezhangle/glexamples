@@ -42,8 +42,8 @@ public:
 public:
     void setupPropertyGroup();
     
-    float transparency() const;
-    void setTransparency(float transparency);
+    unsigned char transparency() const;
+    void setTransparency(unsigned char transparency);
     
 protected:
     virtual void onInitialize() override;
@@ -77,10 +77,11 @@ protected:
     globjects::ref_ptr<globjects::Program> m_program;
     gl::GLint m_transformLocation;
     gl::GLint m_transparencyLocation;
+    gl::GLint m_viewportLocation;
     std::vector<std::unique_ptr<PolygonalDrawable>> m_drawables;
     
     globjects::ref_ptr<globjects::Texture> m_masksTexture;
     
     std::unique_ptr<reflectionzeug::PropertyGroup> m_propertyGroup;
-    float m_transparency;
+    unsigned char m_transparency;
 };

@@ -35,12 +35,13 @@ auto MasksTableGenerator::generateDistributions() -> std::unique_ptr<maskDistrib
 void MasksTableGenerator::generateCombinations()
 {
     m_combinationMasks = std::vector<std::vector<mask_t>>{};
-    
+        
     for (auto k = 0u; k <= m_numSamples; ++k)
     {
         auto kCombinations = std::vector<mask_t>{};
         generateCombinationsForK(0x00, 0, k, kCombinations);
         
+        std::random_shuffle(kCombinations.begin(), kCombinations.end());
         m_combinationMasks.push_back(kCombinations);
     }
 }
@@ -69,7 +70,7 @@ void MasksTableGenerator::generateDistributionForAlpha(
     unsigned int alphaIndex, 
     maskDistribution_t & masks)
 {
-    const auto avgNumSamples = m_numSamples * (static_cast<float>(alphaIndex) / s_alphaRes);
+    const auto avgNumSamples = m_numSamples * (static_cast<float>(alphaIndex) / (s_alphaRes - 1));
     const auto lowNumSamples = glm::floor(avgNumSamples);
     const auto highNumSamples = lowNumSamples + 1.0f;
     const auto ratio = 1.0f - glm::fract(avgNumSamples);
