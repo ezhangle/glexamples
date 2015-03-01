@@ -42,9 +42,6 @@ public:
 public:
     void setupPropertyGroup();
     
-    bool multisampling() const;
-    void setMultisampling(bool b);
-    
     float transparency() const;
     void setTransparency(float transparency);
     
@@ -59,20 +56,8 @@ protected:
     void setupProjection();
     void setupDrawable();
     void setupProgram();
-    void updateFramebuffer();
-    
     void setupMasksTexture();
-    
-    using combination_t = std::bitset<8>;
-    
-    std::vector<std::vector<unsigned char>> generateCombinations(unsigned int numSamples) const;
-    
-    static void generateCombinationsRecursive(
-        const combination_t & combination,
-        unsigned char numSamples,
-        unsigned char offset,
-        unsigned char k,
-        std::vector<unsigned char> & combinations);
+    void updateFramebuffer();
 
 protected:
     /* capabilities */
@@ -97,7 +82,5 @@ protected:
     globjects::ref_ptr<globjects::Texture> m_masksTexture;
     
     std::unique_ptr<reflectionzeug::PropertyGroup> m_propertyGroup;
-    bool m_multisampling;
-    bool m_multisamplingChanged;
     float m_transparency;
 };

@@ -1,12 +1,11 @@
 #version 150 core
-#extension GL_ARB_sample_shading
+#extension GL_ARB_sample_shading : enable
 
 in vec3 v_normal;
 
 out vec4 fragColor;
 
-uniform sampler2D noise;
-uniform vec2 viewport;
+uniform float transparency;
 
 void main()
 {
@@ -17,11 +16,13 @@ void main()
         16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
     );
 
-    int index = int(mod(floor(gl_FragCoord.x), 4) + mod(floor(gl_FragCoord.y), 4) * 4);
+    ivec2 fragCoord = ivec2(mod(floor(gl_FragCoord.xy), 2));
+    ivec2 sampleCoord = ivec2((gl_SampleID / 2), mod(gl_SampleID, 2));
+    int index = (fragCoord.y * 2 + sampleCoord.y) * 4 + (fragCoord.x * 2 + sampleCoord.x);
     float threshold = thresholdMatrix[index];
 
-    if ((threshold) > 0.4)
+    if (threshold > transparency)
         discard;
 
-	fragColor = vec4(v_normal * 0.5 + 0.5, 1.0);
+    fragColor = vec4(v_normal * 0.5 + 0.5, 1.0);
 }

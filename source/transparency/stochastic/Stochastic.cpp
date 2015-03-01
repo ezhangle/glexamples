@@ -52,8 +52,6 @@ Stochastic::Stochastic(gloperate::ResourceManager & resourceManager)
 ,   m_typedRenderTargetCapability{new gloperate::TypedRenderTargetCapability{}}
 ,   m_cameraCapability{new gloperate::CameraCapability{}}
 ,   m_timeCapability{new gloperate::VirtualTimeCapability}
-,   m_multisampling{false}
-,   m_multisamplingChanged{false}
 ,   m_transparency{0.5}
 {
     m_timeCapability->setLoopDuration(20.0f * pi<float>());
@@ -81,26 +79,12 @@ void Stochastic::setupPropertyGroup()
 {
     m_propertyGroup = make_unique<reflectionzeug::PropertyGroup>();
     
-    m_propertyGroup->addProperty<bool>("multisampling", this,
-        &Stochastic::multisampling, &Stochastic::setMultisampling);
-    
     m_propertyGroup->addProperty<float>("transparency", this,
         &Stochastic::transparency, &Stochastic::setTransparency)->setOptions({
         { "minimum", 0.0f },
         { "maximum", 1.0f },
         { "step", 0.1f },
         { "precision", 1u }});
-}
-
-bool Stochastic::multisampling() const
-{
-    return m_multisampling;
-}
-
-void Stochastic::setMultisampling(bool b)
-{
-    m_multisamplingChanged = (m_multisampling != b);
-    m_multisampling = b;
 }
 
 float Stochastic::transparency() const
@@ -138,13 +122,6 @@ void Stochastic::onInitialize()
 
 void Stochastic::onPaint()
 {
-    if (m_multisamplingChanged)
-    {
-        m_multisamplingChanged = false;
-        setupProgram();
-        setupFramebuffer();
-    }
-    
     if (m_viewportCapability->hasChanged())
     {
         glViewport(
@@ -221,10 +198,8 @@ void Stochastic::onTargetFramebufferChanged()
 
 void Stochastic::setupFramebuffer()
 {
-    const auto textureTarget = m_multisampling ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-    
-    m_colorAttachment = Texture::createDefault(textureTarget);
-    m_depthAttachment = Texture::createDefault(textureTarget);
+    m_colorAttachment = Texture::createDefault(GL_TEXTURE_2D_MULTISAMPLE);
+    m_depthAttachment = Texture::createDefault(GL_TEXTURE_2D_MULTISAMPLE);
     
     m_fbo = make_ref<Framebuffer>();
 
@@ -268,16 +243,18 @@ void Stochastic::setupDrawable()
 
 void Stochastic::setupProgram()
 {
-    static const auto shaderPath = std::string{"data/transparency/"};
-    const auto shaderName = m_multisampling ? "screendoor_multisample" : "screendoor";
+    static const auto shaderPath = std::string{"data/transparency/stochastic"};
     
-    const auto vertexShader = shaderPath + shaderName + ".vert";
-    const auto fragmentShader = shaderPath + shaderName + ".frag";
+    const auto vertexShader = shaderPath + ".vert";
+    const auto fragmentShader = shaderPath + ".frag";
     
     m_program = make_ref<Program>();
     m_program->attach(
         Shader::fromFile(GL_VERTEX_SHADER, vertexShader),
         Shader::fromFile(GL_FRAGMENT_SHADER, fragmentShader));
+    
+    const auto masksTextureLocation = m_program->getUniformLocation("masks");
+    m_program->setUniform(masksTextureLocation, 0);
     
     m_transformLocation = m_program->getUniformLocation("transform");
     m_transparencyLocation = m_program->getUniformLocation("transparency");
@@ -292,55 +269,11 @@ void Stochastic::setupMasksTexture()
     m_masksTexture->image2D(0, GL_R8, table->size(), table->at(0).size(), 0, GL_RED, GL_UNSIGNED_BYTE, table->data());
 }
 
-std::vector<std::vector<unsigned char>> Stochastic::generateCombinations(const unsigned int numSamples) const
-{
-    auto combinations = std::vector<std::vector<unsigned char>>{};
-    
-    for (auto k = 0u; k < numSamples; ++k)
-    {
-        auto kCombinations = std::vector<unsigned char>{};
-        generateCombinationsRecursive(0x00, numSamples, 0, k, kCombinations);
-        
-        combinations.push_back(kCombinations);
-    }
-    
-    return combinations;
-}
-
-void Stochastic::generateCombinationsRecursive(
-    const combination_t & combination,
-    const unsigned char numSamples,
-    const unsigned char offset,
-    const unsigned char k,
-    std::vector<unsigned char> & combinations)
-{
-    if (k == 0)
-    {
-        combinations.push_back(combination.to_ulong());
-        return;
-    }
-    
-    for (auto i = offset; i < numSamples - k; ++i)
-    {
-        auto newCombination = combination;
-        newCombination.set(i, true);
-        generateCombinationsRecursive(newCombination, numSamples, i + 1, k - 1, combinations);
-    }
-}
-
 void Stochastic::updateFramebuffer()
 {
     static const auto numSamples = 4u;
     const auto width = m_viewportCapability->width(), height = m_viewportCapability->height();
     
-    if (m_multisampling)
-    {
-        m_colorAttachment->image2DMultisample(numSamples, GL_RGBA8, width, height, GL_TRUE);
-        m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT24, width, height, GL_TRUE);
-    }
-    else
-    {
-        m_colorAttachment->image2D(0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-        m_depthAttachment->image2D(0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
-    }
+    m_colorAttachment->image2DMultisample(numSamples, GL_RGBA8, width, height, GL_TRUE);
+    m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT24, width, height, GL_TRUE);
 }
