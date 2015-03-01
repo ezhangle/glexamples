@@ -51,6 +51,7 @@ set(sources
     ${source_path}/plugin.cpp
     ${source_path}/screendoor/ScreenDoor.cpp
     ${source_path}/stochastic/Stochastic.cpp
+    ${source_path}/stochastic/MasksTableGenerator.cpp
 )
 
 set(api_includes
@@ -61,6 +62,7 @@ set(api_includes
     ${include_path}/util.hpp
     ${include_path}/screendoor/ScreenDoor.h
     ${include_path}/stochastic/Stochastic.h
+    ${include_path}/stochastic/MasksTableGenerator.h
 )
 
 # Group source files

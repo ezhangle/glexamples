@@ -68,9 +68,7 @@ ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
     setupPropertyGroup();
 }
 
-ScreenDoor::~ScreenDoor()
-{
-}
+ScreenDoor::~ScreenDoor() = default;
 
 reflectionzeug::PropertyGroup * ScreenDoor::propertyGroup() const
 {
@@ -126,7 +124,7 @@ void ScreenDoor::onInitialize()
     debug() << "Using global OS X shader replacement '#version 140' -> '#version 150'" << std::endl;
 #endif
 
-    m_grid = new gloperate::AdaptiveGrid{};
+    m_grid = make_ref<gloperate::AdaptiveGrid>();
     m_grid->setColor({0.6f, 0.6f, 0.6f});
 
     setupDrawable();
