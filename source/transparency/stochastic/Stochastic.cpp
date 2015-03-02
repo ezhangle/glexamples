@@ -267,7 +267,8 @@ void Stochastic::setupMasksTexture()
     const auto table = MasksTableGenerator::generateDistributions(numSamples);
     
     m_masksTexture = Texture::createDefault(GL_TEXTURE_2D);
-    m_masksTexture->image2D(0, GL_R8UI, table->at(0).size(), table->size(), 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, table->data());
+    m_masksTexture->image2D(0, GL_R8, table->at(0).size(), table->size(), 0, GL_RED, GL_UNSIGNED_BYTE, table->data());
+    std::cout << glGetError() << std::endl;
     // ToDo: continue here ...
 }
 
