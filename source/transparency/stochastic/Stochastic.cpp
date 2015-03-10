@@ -102,16 +102,6 @@ void Stochastic::onInitialize()
     globjects::init();
     globjects::DebugMessage::enable();
     
-//    glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After, { "glGetError" });
-//    
-//    glbinding::setAfterCallback(
-//        [](const glbinding::FunctionCall &)
-//        {
-//            const auto error = gl::glGetError();
-//            if (error != gl::GL_NO_ERROR)
-//                std::cout << "Error: " << error << std::endl;
-//        });
-    
     onTargetFramebufferChanged();
 
 #ifdef __APPLE__
