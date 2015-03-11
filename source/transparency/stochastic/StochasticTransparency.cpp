@@ -33,6 +33,7 @@
 #include <reflectionzeug/PropertyGroup.h>
 
 #include "MasksTableGenerator.h"
+#include "StochasticTransparencyOptions.h"
 
 #include "../AssimpLoader.h"
 #include "../AssimpProcessing.h"
@@ -53,9 +54,6 @@ StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & reso
 ,   m_typedRenderTargetCapability{new gloperate::TypedRenderTargetCapability{}}
 ,   m_cameraCapability{new gloperate::CameraCapability{}}
 ,   m_timeCapability{new gloperate::VirtualTimeCapability}
-,   m_transparency{160u}
-,   m_optimizationMode{OptimizationMode::AlphaCorrection}
-,   m_backFaceCulling{false}
 {
     m_timeCapability->setLoopDuration(20.0f * pi<float>());
 
@@ -68,63 +66,14 @@ StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & reso
     addCapability(m_timeCapability);
     addCapability(m_typedRenderTargetCapability);
     
-    setupPropertyGroup();
+    m_options = make_unique<StochasticTransparencyOptions>();
 }
 
 StochasticTransparency::~StochasticTransparency() = default;
 
 reflectionzeug::PropertyGroup * StochasticTransparency::propertyGroup() const
 {
-    return m_propertyGroup.get();
-}
-
-void StochasticTransparency::setupPropertyGroup()
-{
-    m_propertyGroup = make_unique<reflectionzeug::PropertyGroup>();
-    
-    m_propertyGroup->addProperty<unsigned char>("transparency", this,
-        &StochasticTransparency::transparency, &StochasticTransparency::setTransparency)->setOptions({
-        { "minimum", 0 },
-        { "maximum", 255 },
-        { "step", 1 }});
-    
-    m_propertyGroup->addProperty<OptimizationMode>("optimization_mode", this,
-        &StochasticTransparency::optimizationMode, &StochasticTransparency::setOptimizationMode)->setStrings({
-        { OptimizationMode::AlphaCorrection, "AlphaCorrection" },
-        { OptimizationMode::AlphaCorrectionAndDepthBased, "AlphaCorrectionAndDepthBased" }});
-    
-    m_propertyGroup->addProperty<bool>("back_face_culling", this,
-        &StochasticTransparency::backFaceCulling, &StochasticTransparency::setBackFaceCulling);
-}
-
-unsigned char StochasticTransparency::transparency() const
-{
-    return m_transparency;
-}
-
-void StochasticTransparency::setTransparency(unsigned char transparency)
-{
-    m_transparency = transparency;
-}
-
-auto StochasticTransparency::optimizationMode() const -> OptimizationMode
-{
-    return m_optimizationMode;
-}
-
-void StochasticTransparency::setOptimizationMode(OptimizationMode mode)
-{
-    m_optimizationMode = mode;
-}
-
-bool StochasticTransparency::backFaceCulling() const
-{
-    return m_backFaceCulling;
-}
-
-void StochasticTransparency::setBackFaceCulling(bool b)
-{
-    m_backFaceCulling = b;
+    return m_options.get();
 }
 
 void StochasticTransparency::onInitialize()
@@ -308,7 +257,7 @@ void StochasticTransparency::updateUniforms()
 {
     const auto transform = m_projectionCapability->projection() * m_cameraCapability->view();
     const auto eye = m_cameraCapability->eye();
-    const auto transparency = static_cast<unsigned int>(m_transparency);
+    const auto transparency = static_cast<unsigned int>(m_options->transparency());
     
     m_grid->update(eye, transform);
     
@@ -336,7 +285,7 @@ void StochasticTransparency::renderOpaqueGeometry()
 
 void StochasticTransparency::renderTransparentGeometry()
 {
-    if (m_backFaceCulling)
+    if (m_options->backFaceCulling())
         glEnable(GL_CULL_FACE);
     
     renderTotalAlpha();
@@ -344,11 +293,11 @@ void StochasticTransparency::renderTransparentGeometry()
     glEnable(GL_SAMPLE_SHADING);
     glMinSampleShading(1.0);
 
-    if (m_optimizationMode == OptimizationMode::AlphaCorrection)
+    if (m_options->optimization() == StochasticTransparencyOptimization::AlphaCorrection)
     {
         renderAlphaToCoverage();
     }
-    else if (m_optimizationMode == OptimizationMode::AlphaCorrectionAndDepthBased)
+    else if (m_options->optimization() == StochasticTransparencyOptimization::AlphaCorrectionAndDepthBased)
     {
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         renderAlphaToCoverage();

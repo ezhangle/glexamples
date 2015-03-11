@@ -32,29 +32,15 @@ namespace gloperate
 }
 
 class PolygonalDrawable;
+class StochasticTransparencyOptions;
 
 class StochasticTransparency : public gloperate::Painter
 {
 public:
-    enum class OptimizationMode { AlphaCorrection, AlphaCorrectionAndDepthBased };
-
-public:
     StochasticTransparency(gloperate::ResourceManager & resourceManager);
-    virtual ~StochasticTransparency();
+    virtual ~StochasticTransparency() override;
     
     virtual reflectionzeug::PropertyGroup * propertyGroup() const override;
-    
-protected:
-    void setupPropertyGroup();
-
-    unsigned char transparency() const;
-    void setTransparency(unsigned char transparency);
-    
-    OptimizationMode optimizationMode() const;
-    void setOptimizationMode(OptimizationMode mode);
-    
-    bool backFaceCulling() const;
-    void setBackFaceCulling(bool b);
     
 protected:
     virtual void onInitialize() override;
@@ -139,10 +125,7 @@ private:
     /** \name Properties */
     /** \{ */
     
-    std::unique_ptr<reflectionzeug::PropertyGroup> m_propertyGroup;
-    unsigned char m_transparency;
-    OptimizationMode m_optimizationMode;
-    bool m_backFaceCulling;
+    std::unique_ptr<StochasticTransparencyOptions> m_options;
     
     /** \} */
 };

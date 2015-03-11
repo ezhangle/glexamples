@@ -51,6 +51,7 @@ set(sources
     ${source_path}/plugin.cpp
     ${source_path}/screendoor/ScreenDoor.cpp
     ${source_path}/stochastic/StochasticTransparency.cpp
+    ${source_path}/stochastic/StochasticTransparencyOptions.cpp
     ${source_path}/stochastic/MasksTableGenerator.cpp
 )
 
@@ -62,6 +63,7 @@ set(api_includes
     ${include_path}/util.hpp
     ${include_path}/screendoor/ScreenDoor.h
     ${include_path}/stochastic/StochasticTransparency.h
+    ${include_path}/stochastic/StochasticTransparencyOptions.h
     ${include_path}/stochastic/MasksTableGenerator.h
 )
 
