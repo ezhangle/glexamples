@@ -29,6 +29,8 @@ find_library(ASSIMP_LIBRARIES
     $ENV{ASSIMP_HOME}/lib/x${ASSIMP_PF}
     $ENV{ASSIMP_HOME}/lib
     $ENV{ASSIMP_HOME}/lib/.libs
+    $ENV{ASSIMP_HOME}/build/code
+    $ENV{ASSIMP_HOME}/build-debug/code
     $ENV{ASSIMPDIR}
     $ENV{ASSIMP_HOME}
     /usr/lib64

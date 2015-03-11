@@ -47,7 +47,7 @@ set(LINUX_COMPILE_FLAGS
       -fPIC         # -> use position independent code
       
       -Wreturn-type 
-      -Wfloat-equal 
+    # -Wfloat-equal 
     # -Wshadow      # -> e.g. when a parameter is named like a member, too many warnings, disabled for now
       -Wcast-align 
     # -Wconversion
