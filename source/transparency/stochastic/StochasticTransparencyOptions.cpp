@@ -1,5 +1,7 @@
 #include "StochasticTransparencyOptions.h"
 
+#include <glm/common.hpp>
+
 #include <glbinding/gl/enum.h>
 
 #include <globjects/globjects.h>
@@ -41,7 +43,7 @@ void StochasticTransparencyOptions::initGL()
 {
     const auto maxNumSamples = globjects::getInteger(gl::GL_MAX_COLOR_TEXTURE_SAMPLES);
     
-    property("num_samples")->setOption("maximum", static_cast<uint16_t>(maxNumSamples));
+    property("num_samples")->setOption("maximum", static_cast<uint16_t>(glm::min(8, maxNumSamples)));
 }
 
 unsigned char StochasticTransparencyOptions::transparency() const

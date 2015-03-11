@@ -15,10 +15,12 @@ uniform vec2 viewport;
 float rand();
 float calculateAlpha(uint mask);
 
+const float denormFactor = pow(2.0, 8.0) - 1.0;
+
 void main()
 {
     ivec2 index = ivec2(rand() * 1023.0, transparency);
-    uint mask = uint(texelFetch(masksTexture, index, 0).r * 65535.0);
+    uint mask = uint(texelFetch(masksTexture, index, 0).r * denormFactor);
 
     uint sampleBit = 1u << gl_SampleID;
     if ((mask & sampleBit) != sampleBit)

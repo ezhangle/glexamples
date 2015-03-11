@@ -236,7 +236,7 @@ void StochasticTransparency::setupMasksTexture()
     const auto table = MasksTableGenerator::generateDistributions(numSamples);
     
     m_masksTexture = Texture::createDefault(GL_TEXTURE_2D);
-    m_masksTexture->image2D(0, GL_R16, table->at(0).size(), table->size(), 0, GL_RED, GL_UNSIGNED_SHORT, table->data());
+    m_masksTexture->image2D(0, GL_R8, table->at(0).size(), table->size(), 0, GL_RED, GL_UNSIGNED_BYTE, table->data());
 }
 
 void StochasticTransparency::updateFramebuffer()
@@ -247,7 +247,7 @@ void StochasticTransparency::updateFramebuffer()
     m_opaqueColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_FALSE);
     m_transparentColorAttachment->image2DMultisample(numSamples, GL_RGBA32F, size, GL_FALSE);
     m_totalAlphaAttachment->image2DMultisample(numSamples, GL_R32F, size, GL_FALSE);
-    m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT24, size, GL_FALSE);
+    m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT16, size, GL_FALSE);
 }
 
 void StochasticTransparency::updateNumSamples()
