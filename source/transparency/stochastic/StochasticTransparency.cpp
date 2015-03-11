@@ -126,9 +126,29 @@ void StochasticTransparency::onPaint()
     clearBuffers();
     updateUniforms();
     
-    renderOpaqueGeometry();
-    renderTransparentGeometry();
-    composite();
+    if (m_options->optimization() == StochasticTransparencyOptimization::NoOptimization)
+    {
+        renderOpaqueGeometry();
+        
+        if (m_options->backFaceCulling())
+            glEnable(GL_CULL_FACE);
+        
+        glEnable(GL_SAMPLE_SHADING);
+        glMinSampleShading(1.0);
+        
+        renderAlphaToCoverage(kOpaqueColorAttachment);
+        
+        glDisable(GL_SAMPLE_SHADING);
+        glDisable(GL_CULL_FACE);
+        
+        blit();
+    }
+    else
+    {
+        renderOpaqueGeometry();
+        renderTransparentGeometry();
+        composite();
+    }
     
     Framebuffer::unbind(GL_FRAMEBUFFER);
 }
@@ -314,12 +334,12 @@ void StochasticTransparency::renderTransparentGeometry()
 
     if (m_options->optimization() == StochasticTransparencyOptimization::AlphaCorrection)
     {
-        renderAlphaToCoverage();
+        renderAlphaToCoverage(kTransparentColorAttachment);
     }
     else if (m_options->optimization() == StochasticTransparencyOptimization::AlphaCorrectionAndDepthBased)
     {
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        renderAlphaToCoverage();
+        renderAlphaToCoverage(kTransparentColorAttachment);
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         
         renderColorAccumulation();
@@ -350,13 +370,13 @@ void StochasticTransparency::renderTotalAlpha()
     glDisable(GL_BLEND);
 }
 
-void StochasticTransparency::renderAlphaToCoverage()
+void StochasticTransparency::renderAlphaToCoverage(gl::GLenum colorAttachment)
 {
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
 
     m_fbo->bind(GL_FRAMEBUFFER);
-    m_fbo->setDrawBuffer(kTransparentColorAttachment);
+    m_fbo->setDrawBuffer(colorAttachment);
     
     m_masksTexture->bindActive(GL_TEXTURE0);
 
@@ -390,6 +410,28 @@ void StochasticTransparency::renderColorAccumulation()
 
     glDisable(GL_BLEND);
     glDepthFunc(GL_LESS);
+}
+
+void StochasticTransparency::blit()
+{
+    auto targetfbo = m_targetFramebufferCapability->framebuffer();
+    auto drawBuffer = GL_COLOR_ATTACHMENT0;
+    
+    if (!targetfbo)
+    {
+        targetfbo = Framebuffer::defaultFBO();
+        drawBuffer = GL_BACK_LEFT;
+    }
+    
+    const auto rect = std::array<GLint, 4>{{
+        m_viewportCapability->x(),
+        m_viewportCapability->y(),
+        m_viewportCapability->width(),
+        m_viewportCapability->height()
+    }};
+    
+    m_fbo->blit(kOpaqueColorAttachment, rect, targetfbo, drawBuffer, rect,
+        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
 
 void StochasticTransparency::composite()

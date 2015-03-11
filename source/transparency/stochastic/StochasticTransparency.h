@@ -64,8 +64,9 @@ protected:
     void renderOpaqueGeometry();
     void renderTransparentGeometry();
     void renderTotalAlpha();
-    void renderAlphaToCoverage();
+    void renderAlphaToCoverage(gl::GLenum colorAttachment);
     void renderColorAccumulation();
+    void blit();
     void composite();
 
 private:

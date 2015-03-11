@@ -5,7 +5,7 @@
 #include <reflectionzeug/PropertyGroup.h>
 
 
-enum class StochasticTransparencyOptimization { AlphaCorrection, AlphaCorrectionAndDepthBased };
+enum class StochasticTransparencyOptimization { NoOptimization, AlphaCorrection, AlphaCorrectionAndDepthBased };
 
 class StochasticTransparencyOptions : public reflectionzeug::PropertyGroup
 {

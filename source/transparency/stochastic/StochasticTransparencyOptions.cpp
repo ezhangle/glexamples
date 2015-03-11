@@ -24,6 +24,7 @@ StochasticTransparencyOptions::StochasticTransparencyOptions()
     addProperty<StochasticTransparencyOptimization>("optimization", this,
         &StochasticTransparencyOptions::optimization,
         &StochasticTransparencyOptions::setOptimization)->setStrings({
+        { StochasticTransparencyOptimization::NoOptimization, "NoOptimization" },
         { StochasticTransparencyOptimization::AlphaCorrection, "AlphaCorrection" },
         { StochasticTransparencyOptimization::AlphaCorrectionAndDepthBased, "AlphaCorrectionAndDepthBased" }});
     

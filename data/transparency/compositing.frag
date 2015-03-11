@@ -30,7 +30,7 @@ void main()
     vec4 transparentColor = filteredTexelFetch(transparentColorTexture, coordinate);
 
     if (transparentColor.a != 0.0)
-        fragColor = opaqueColor * (complTotalAlpha) + transparentColor.rgb * ((1.0 - complTotalAlpha) / transparentColor.a);
+        fragColor = opaqueColor * complTotalAlpha + transparentColor.rgb * ((1.0 - complTotalAlpha) / transparentColor.a);
     else
         fragColor = opaqueColor;
 }
