@@ -47,7 +47,7 @@ void MasksTableGenerator::generateCombinations()
 }
 
 void MasksTableGenerator::generateCombinationsForK(
-    const std::bitset<16> & combination,
+    const std::bitset<32> & combination,
     unsigned char offset,
     unsigned char k,
     std::vector<mask_t> & combinationMasks)

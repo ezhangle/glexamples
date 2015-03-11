@@ -13,7 +13,7 @@ public:
     static const auto s_alphaRes = 256u;
     static const auto s_numMasks = 1024u;
 
-    using mask_t = uint16_t;
+    using mask_t = uint32_t;
     using maskDistribution_t = std::array<mask_t, s_numMasks>;
     
     using maskDistributions_t = std::array<maskDistribution_t, s_alphaRes>;
@@ -31,7 +31,7 @@ protected:
     void generateCombinations();
 
     void generateCombinationsForK(
-        const std::bitset<16> & combination,
+        const std::bitset<32> & combination,
         unsigned char offset,
         unsigned char k,
         std::vector<mask_t> & combinationMasks);
