@@ -6,6 +6,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include <glbinding/gl/boolean.h>
 #include <glbinding/gl/enum.h>
@@ -70,7 +71,7 @@ ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
 
 ScreenDoor::~ScreenDoor() = default;
 
-reflectionzeug::PropertyGroup * ScreenDoor::propertyGroup() const
+reflectionzeug::PropertyGroup * ScreenDoor::properties() const
 {
     return m_propertyGroup.get();
 }

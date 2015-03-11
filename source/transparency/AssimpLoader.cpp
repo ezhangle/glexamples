@@ -75,7 +75,7 @@ std::string AssimpLoader::allLoadingTypes() const
     return string;
 }
 
-aiScene * AssimpLoader::load(const std::string & filename, std::function<void(int, int)> progress) const
+aiScene * AssimpLoader::load(const std::string & filename, std::function<void(int, int)> /*progress*/) const
 {
     auto scene = aiImportFile(
         filename.c_str(),

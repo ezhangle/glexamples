@@ -37,7 +37,7 @@ public:
     ScreenDoor(gloperate::ResourceManager & resourceManager);
     virtual ~ScreenDoor();
     
-    virtual reflectionzeug::PropertyGroup * propertyGroup() const override;
+    virtual reflectionzeug::PropertyGroup * properties() const override;
     
 public:
     void setupPropertyGroup();

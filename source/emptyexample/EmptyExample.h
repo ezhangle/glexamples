@@ -33,6 +33,8 @@ public:
 
     void setupProjection();
 
+    virtual reflectionzeug::PropertyGroup * properties() const override { return nullptr; }
+
 protected:
     virtual void onInitialize();
     virtual void onPaint();
