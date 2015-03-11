@@ -144,6 +144,7 @@ void Stochastic::onPaint()
     renderOpaqueGeometry();
     renderTotalAlpha();
     renderTransparentGeometry();
+    renderTransparentColors();
     composite();
     
     Framebuffer::unbind(GL_FRAMEBUFFER);
@@ -213,6 +214,7 @@ void Stochastic::setupPrograms()
 {
     static const auto totalAlphaShaders = "total_alpha";
     static const auto alphaToCoverageShaders = "alpha_to_coverage";
+    static const auto transparentColorsShaders = "transparent_colors";
     static const auto compositingShaders = "compositing";
     
     const auto initProgram = [] (globjects::ref_ptr<globjects::Program> & program, const char * shaders)
@@ -227,6 +229,7 @@ void Stochastic::setupPrograms()
     
     initProgram(m_totalAlphaProgram, totalAlphaShaders);
     initProgram(m_alphaToCoverageProgram, alphaToCoverageShaders);
+    initProgram(m_transparentColorsProgram, transparentColorsShaders);
     initProgram(m_compositingProgram, compositingShaders);
     
     m_alphaToCoverageProgram->setUniform(kMasksTextureUniform, 0);
@@ -257,7 +260,7 @@ void Stochastic::updateFramebuffer()
     const auto size = glm::ivec2{m_viewportCapability->width(), m_viewportCapability->height()};
     
     m_opaqueColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_FALSE);
-    m_transparentColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_FALSE);
+    m_transparentColorAttachment->image2DMultisample(numSamples, GL_RGBA32F, size, GL_FALSE);
     m_totalAlphaAttachment->image2DMultisample(numSamples, GL_R32F, size, GL_FALSE);
     m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT24, size, GL_FALSE);
 }
@@ -317,10 +320,10 @@ void Stochastic::renderTransparentGeometry()
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    
     glEnable(GL_SAMPLE_SHADING);
     glMinSampleShading(1.0);
-    
-    glEnable(GL_CULL_FACE);
     
     m_fbo->bind(GL_FRAMEBUFFER);
     m_fbo->setDrawBuffer(kTransparentColorAttachment);
@@ -338,8 +341,40 @@ void Stochastic::renderTransparentGeometry()
 
     m_alphaToCoverageProgram->release();
     
-    glDisable(GL_CULL_FACE);
     glDisable(GL_SAMPLE_SHADING);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+}
+
+void Stochastic::renderTransparentColors()
+{
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    
+    glDepthFunc(GL_LEQUAL);
+    
+    glEnable (GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    
+    glEnable(GL_SAMPLE_SHADING);
+    glMinSampleShading(1.0);
+    
+    m_fbo->bind(GL_FRAMEBUFFER);
+    m_fbo->setDrawBuffer(kTransparentColorAttachment);
+    
+    m_transparentColorsProgram->use();
+    
+    const auto transform = m_projectionCapability->projection() * m_cameraCapability->view();
+    m_transparentColorsProgram->setUniform(kTransformUniform, transform);
+    m_transparentColorsProgram->setUniform(kTransparencyUniform, static_cast<unsigned int>(m_transparency));
+    
+    for (auto & drawable : m_drawables)
+        drawable->draw();
+    
+    m_transparentColorsProgram->release();
+    
+    glDisable(GL_SAMPLE_SHADING);
+    glDisable(GL_BLEND);
+    glDepthFunc(GL_LESS);
 }
 
 void Stochastic::composite()

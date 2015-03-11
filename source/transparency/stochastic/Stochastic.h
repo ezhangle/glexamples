@@ -66,6 +66,7 @@ protected:
     void renderOpaqueGeometry();
     void renderTotalAlpha();
     void renderTransparentGeometry();
+    void renderTransparentColors();
     void composite();
 
 private:
@@ -108,6 +109,8 @@ private:
     
     globjects::ref_ptr<globjects::Program> m_alphaToCoverageProgram;
     globjects::ref_ptr<globjects::Texture> m_masksTexture;
+    
+    globjects::ref_ptr<globjects::Program> m_transparentColorsProgram;
     
     globjects::ref_ptr<globjects::Program> m_compositingProgram;
     
