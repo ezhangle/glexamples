@@ -98,11 +98,6 @@ private:
     
     /** \name Programs */
     /** \{ */
-
-    static constexpr auto kTransformUniform = "transform";
-    static constexpr auto kTransparencyUniform = "transparency";
-    static constexpr auto kMasksTextureUniform = "masksTexture";
-    static constexpr auto kViewportUniform = "viewport";
     
     globjects::ref_ptr<globjects::Program> m_totalAlphaProgram;
     

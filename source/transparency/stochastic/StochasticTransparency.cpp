@@ -114,7 +114,7 @@ void StochasticTransparency::onPaint()
         m_viewportCapability->setChanged(false);
         
         const auto viewport = glm::vec2{m_viewportCapability->width(), m_viewportCapability->height()};
-        m_alphaToCoverageProgram->setUniform(kViewportUniform, viewport);
+        m_alphaToCoverageProgram->setUniform("viewport", viewport);
         
         updateFramebuffer();
     }
@@ -214,7 +214,7 @@ void StochasticTransparency::setupPrograms()
     initProgram(m_colorAccumulationProgram, transparentColorsShaders);
     initProgram(m_compositingProgram, compositingShaders);
     
-    m_alphaToCoverageProgram->setUniform(kMasksTextureUniform, 0);
+    m_alphaToCoverageProgram->setUniform("masksTexture", 0);
     
     updateNumSamplesUniforms();
     
@@ -281,8 +281,8 @@ void StochasticTransparency::updateUniforms()
     
     auto updateProgramUniforms = [&transform, &transparency] (Program * program)
     {
-        program->setUniform(kTransformUniform, transform);
-        program->setUniform(kTransparencyUniform, transparency);
+        program->setUniform("transform", transform);
+        program->setUniform("transparency", transparency);
     };
     
     updateProgramUniforms(m_totalAlphaProgram);

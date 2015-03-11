@@ -10,8 +10,8 @@
 class MasksTableGenerator
 {
 public:
-    static constexpr auto s_alphaRes = 256u;
-    static constexpr auto s_numMasks = 1024u;
+    static const auto s_alphaRes = 256u;
+    static const auto s_numMasks = 1024u;
 
     using mask_t = uint16_t;
     using maskDistribution_t = std::array<mask_t, s_numMasks>;
