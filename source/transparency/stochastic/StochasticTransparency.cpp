@@ -54,6 +54,7 @@ StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & reso
 ,   m_typedRenderTargetCapability{new gloperate::TypedRenderTargetCapability{}}
 ,   m_cameraCapability{new gloperate::CameraCapability{}}
 ,   m_timeCapability{new gloperate::VirtualTimeCapability}
+,   m_options{make_unique<StochasticTransparencyOptions>()}
 {
     m_timeCapability->setLoopDuration(20.0f * pi<float>());
 
@@ -65,13 +66,11 @@ StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & reso
     addCapability(m_cameraCapability);
     addCapability(m_timeCapability);
     addCapability(m_typedRenderTargetCapability);
-    
-    m_options = make_unique<StochasticTransparencyOptions>();
 }
 
 StochasticTransparency::~StochasticTransparency() = default;
 
-reflectionzeug::PropertyGroup * StochasticTransparency::propertyGroup() const
+reflectionzeug::PropertyGroup * StochasticTransparency::properties() const
 {
     return m_options.get();
 }

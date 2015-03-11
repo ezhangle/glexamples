@@ -102,10 +102,10 @@ int main(int argc, char * argv[])
     mainWindow.setCentralWidget(QWidget::createWindowContainer(window));
     mainWindow.centralWidget()->setFocusPolicy(Qt::StrongFocus);
 
-    if (painter->propertyGroup())
+    if (painter->properties())
     {
         auto dockWidget = new QDockWidget{};
-        auto propertyBrowser = new propertyguizeug::PropertyBrowser{painter->propertyGroup()};
+        auto propertyBrowser = new propertyguizeug::PropertyBrowser{painter->properties()};
         
         dockWidget->setWidget(propertyBrowser);
         mainWindow.addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
