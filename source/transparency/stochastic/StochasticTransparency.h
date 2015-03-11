@@ -33,11 +33,14 @@ namespace gloperate
 
 class PolygonalDrawable;
 
-class Stochastic : public gloperate::Painter
+class StochasticTransparency : public gloperate::Painter
 {
 public:
-    Stochastic(gloperate::ResourceManager & resourceManager);
-    virtual ~Stochastic();
+    enum class OptimizationMode { AlphaCorrection, AlphaCorrectionAndDepthBased };
+
+public:
+    StochasticTransparency(gloperate::ResourceManager & resourceManager);
+    virtual ~StochasticTransparency();
     
     virtual reflectionzeug::PropertyGroup * propertyGroup() const override;
     
@@ -46,6 +49,9 @@ protected:
 
     unsigned char transparency() const;
     void setTransparency(unsigned char transparency);
+    
+    OptimizationMode optimizationMode() const;
+    void setOptimizationMode(OptimizationMode mode);
     
 protected:
     virtual void onInitialize() override;
@@ -63,10 +69,12 @@ protected:
     
 protected:
     void clearBuffers();
+    void updateUniforms();
     void renderOpaqueGeometry();
     void renderTotalAlpha();
     void renderTransparentGeometry();
-    void renderTransparentColors();
+    void renderAlphaToCoverage();
+    void renderColorAccumulation();
     void composite();
 
 private:
@@ -110,7 +118,7 @@ private:
     globjects::ref_ptr<globjects::Program> m_alphaToCoverageProgram;
     globjects::ref_ptr<globjects::Texture> m_masksTexture;
     
-    globjects::ref_ptr<globjects::Program> m_transparentColorsProgram;
+    globjects::ref_ptr<globjects::Program> m_colorAccumulationProgram;
     
     globjects::ref_ptr<globjects::Program> m_compositingProgram;
     
@@ -130,6 +138,7 @@ private:
     
     std::unique_ptr<reflectionzeug::PropertyGroup> m_propertyGroup;
     unsigned char m_transparency;
+    OptimizationMode m_optimizationMode;
     
     /** \} */
 };

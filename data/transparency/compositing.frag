@@ -22,20 +22,6 @@ vec4 filteredTexelFetch(in sampler2DMS texture, in ivec2 coordinate)
     return texelSum / float(numSamples);
 }
 
-// vec3 dimmedOpaqueColor(in ivec2 coordinate)
-// {
-//     vec3 opaqueColor = vec3(0.0);
-
-//     for (int i = 0; i < numSamples; ++i)
-//     {
-//         vec3 sampleColor = texelFetch(opaqueColorTexture, coordinate, i).rgb;
-//         float totalAlpha = texelFetch(totalAlphaTexture, coordinate, i).r;
-//         opaqueColor += sampleColor * (1.0 - totalAlpha);
-//     }
-
-//     return opaqueColor / float(numSamples);
-// }
-
 void main()
 {
     ivec2 coordinate = ivec2(gl_FragCoord.xy);
