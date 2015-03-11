@@ -55,6 +55,7 @@ StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & reso
 ,   m_timeCapability{new gloperate::VirtualTimeCapability}
 ,   m_transparency{160u}
 ,   m_optimizationMode{OptimizationMode::AlphaCorrection}
+,   m_backFaceCulling{false}
 {
     m_timeCapability->setLoopDuration(20.0f * pi<float>());
 
@@ -91,6 +92,9 @@ void StochasticTransparency::setupPropertyGroup()
         &StochasticTransparency::optimizationMode, &StochasticTransparency::setOptimizationMode)->setStrings({
         { OptimizationMode::AlphaCorrection, "AlphaCorrection" },
         { OptimizationMode::AlphaCorrectionAndDepthBased, "AlphaCorrectionAndDepthBased" }});
+    
+    m_propertyGroup->addProperty<bool>("back_face_culling", this,
+        &StochasticTransparency::backFaceCulling, &StochasticTransparency::setBackFaceCulling);
 }
 
 unsigned char StochasticTransparency::transparency() const
@@ -111,6 +115,16 @@ auto StochasticTransparency::optimizationMode() const -> OptimizationMode
 void StochasticTransparency::setOptimizationMode(OptimizationMode mode)
 {
     m_optimizationMode = mode;
+}
+
+bool StochasticTransparency::backFaceCulling() const
+{
+    return m_backFaceCulling;
+}
+
+void StochasticTransparency::setBackFaceCulling(bool b)
+{
+    m_backFaceCulling = b;
 }
 
 void StochasticTransparency::onInitialize()
@@ -159,7 +173,6 @@ void StochasticTransparency::onPaint()
     updateUniforms();
     
     renderOpaqueGeometry();
-    renderTotalAlpha();
     renderTransparentGeometry();
     composite();
     
@@ -321,46 +334,52 @@ void StochasticTransparency::renderOpaqueGeometry()
     m_grid->draw();
 }
 
-void StochasticTransparency::renderTotalAlpha()
-{
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
-
-    glEnable (GL_BLEND);
-    glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
-
-    m_fbo->bind(GL_FRAMEBUFFER);
-    m_fbo->setDrawBuffer(kTotalAlphaAttachment);
-
-    m_totalAlphaProgram->use();
-
-    for (auto & drawable : m_drawables)
-        drawable->draw();
-
-    m_totalAlphaProgram->release();
-    
-    glDisable(GL_BLEND);
-}
-
-
 void StochasticTransparency::renderTransparentGeometry()
 {
+    if (m_backFaceCulling)
+        glEnable(GL_CULL_FACE);
+    
+    renderTotalAlpha();
+    
     glEnable(GL_SAMPLE_SHADING);
     glMinSampleShading(1.0);
 
     if (m_optimizationMode == OptimizationMode::AlphaCorrection)
     {
         renderAlphaToCoverage();
-        return;
+    }
+    else if (m_optimizationMode == OptimizationMode::AlphaCorrectionAndDepthBased)
+    {
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        renderAlphaToCoverage();
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        
+        renderColorAccumulation();
     }
     
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    renderAlphaToCoverage();
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    
-    renderColorAccumulation();
-
     glDisable(GL_SAMPLE_SHADING);
+    glDisable(GL_CULL_FACE);
+}
+
+void StochasticTransparency::renderTotalAlpha()
+{
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    
+    glEnable (GL_BLEND);
+    glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+    
+    m_fbo->bind(GL_FRAMEBUFFER);
+    m_fbo->setDrawBuffer(kTotalAlphaAttachment);
+    
+    m_totalAlphaProgram->use();
+    
+    for (auto & drawable : m_drawables)
+        drawable->draw();
+    
+    m_totalAlphaProgram->release();
+    
+    glDisable(GL_BLEND);
 }
 
 void StochasticTransparency::renderAlphaToCoverage()

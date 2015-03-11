@@ -53,6 +53,9 @@ protected:
     OptimizationMode optimizationMode() const;
     void setOptimizationMode(OptimizationMode mode);
     
+    bool backFaceCulling() const;
+    void setBackFaceCulling(bool b);
+    
 protected:
     virtual void onInitialize() override;
     virtual void onPaint() override;
@@ -71,8 +74,8 @@ protected:
     void clearBuffers();
     void updateUniforms();
     void renderOpaqueGeometry();
-    void renderTotalAlpha();
     void renderTransparentGeometry();
+    void renderTotalAlpha();
     void renderAlphaToCoverage();
     void renderColorAccumulation();
     void composite();
@@ -139,6 +142,7 @@ private:
     std::unique_ptr<reflectionzeug::PropertyGroup> m_propertyGroup;
     unsigned char m_transparency;
     OptimizationMode m_optimizationMode;
+    bool m_backFaceCulling;
     
     /** \} */
 };
