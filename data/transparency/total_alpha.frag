@@ -1,4 +1,4 @@
-#version 140 core
+#version 150 core
 #extension GL_ARB_explicit_attrib_location : require
 
 layout(location = 0) out float fragTransparency;
