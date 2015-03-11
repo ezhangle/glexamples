@@ -234,12 +234,10 @@ void Stochastic::setupPrograms()
     const auto opaqueColorLocation = m_compositingProgram->getUniformLocation("opaqueColorTexture");
     const auto totalAlphaLocation = m_compositingProgram->getUniformLocation("totalAlphaTexture");
     const auto transparentColorLocation = m_compositingProgram->getUniformLocation("transparentColorTexture");
-    const auto depthLocation = m_compositingProgram->getUniformLocation("depthTexture");
     
     m_compositingProgram->setUniform(opaqueColorLocation, 0);
     m_compositingProgram->setUniform(totalAlphaLocation, 1);
     m_compositingProgram->setUniform(transparentColorLocation, 2);
-    m_compositingProgram->setUniform(depthLocation, 3);
     
     m_compositingQuad = make_ref<gloperate::ScreenAlignedQuad>(m_compositingProgram);
 }
@@ -258,10 +256,10 @@ void Stochastic::updateFramebuffer()
     static const auto numSamples = 8u;
     const auto size = glm::ivec2{m_viewportCapability->width(), m_viewportCapability->height()};
     
-    m_opaqueColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_TRUE);
-    m_transparentColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_TRUE);
-    m_totalAlphaAttachment->image2DMultisample(numSamples, GL_R32F, size, GL_TRUE);
-    m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT24, size, GL_TRUE);
+    m_opaqueColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_FALSE);
+    m_transparentColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_FALSE);
+    m_totalAlphaAttachment->image2DMultisample(numSamples, GL_R32F, size, GL_FALSE);
+    m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT24, size, GL_FALSE);
 }
 
 void Stochastic::clearBuffers()
@@ -269,8 +267,8 @@ void Stochastic::clearBuffers()
     m_fbo->setDrawBuffers({ kOpaqueColorAttachment, kTransparentColorAttachment, kTotalAlphaAttachment });
     
     m_fbo->clearBuffer(GL_COLOR, 0, glm::vec4{0.85f, 0.87f, 0.91f, 1.0f});
-    m_fbo->clearBuffer(GL_COLOR, 1, glm::vec4{0.0f, 0.0f, 0.0f, 0.0f});
-    m_fbo->clearBuffer(GL_COLOR, 2, glm::vec4{0.0f});
+    m_fbo->clearBuffer(GL_COLOR, 1, glm::vec4{0.0f});
+    m_fbo->clearBuffer(GL_COLOR, 2, glm::vec4{1.0f});
     m_fbo->clearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0.0f);
 }
 
@@ -295,7 +293,7 @@ void Stochastic::renderTotalAlpha()
     glDepthMask(GL_FALSE);
 
     glEnable (GL_BLEND);
-    glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+    glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
 
     m_fbo->bind(GL_FRAMEBUFFER);
     m_fbo->setDrawBuffer(kTotalAlphaAttachment);
@@ -359,7 +357,15 @@ void Stochastic::composite()
     m_opaqueColorAttachment->bindActive(GL_TEXTURE0);
     m_totalAlphaAttachment->bindActive(GL_TEXTURE1);
     m_transparentColorAttachment->bindActive(GL_TEXTURE2);
-    m_depthAttachment->bindActive(GL_TEXTURE3);
     
     m_compositingQuad->draw();
+    
+    const auto rect = std::array<GLint, 4>{{
+        m_viewportCapability->x(),
+        m_viewportCapability->y(),
+        m_viewportCapability->width(),
+        m_viewportCapability->height()
+    }};
+
+    m_fbo->blit(GL_COLOR_ATTACHMENT0, rect, targetfbo, GL_BACK_LEFT, rect, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
