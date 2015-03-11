@@ -8,9 +8,8 @@ layout (location = 0) out vec3 fragColor;
 uniform sampler2DMS opaqueColorTexture;
 uniform sampler2DMS totalAlphaTexture;
 uniform sampler2DMS transparentColorTexture;
+uniform int numSamples;
 
-
-const int numSamples = 8;
 
 vec4 filteredTexelFetch(in sampler2DMS texture, in ivec2 coordinate)
 {

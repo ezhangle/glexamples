@@ -18,7 +18,7 @@ float calculateAlpha(uint mask);
 void main()
 {
     ivec2 index = ivec2(rand() * 1023.0, transparency);
-    uint mask = uint(texelFetch(masksTexture, index, 0).r * 255.0);
+    uint mask = uint(texelFetch(masksTexture, index, 0).r * 65535.0);
 
     uint sampleBit = 1u << gl_SampleID;
     if ((mask & sampleBit) != sampleBit)

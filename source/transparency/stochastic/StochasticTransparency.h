@@ -55,6 +55,8 @@ protected:
     void setupMasksTexture();
     void setupDrawable();
     void updateFramebuffer();
+    void updateNumSamples();
+    void updateNumSamplesUniforms();
     
 protected:
     void clearBuffers();

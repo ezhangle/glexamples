@@ -1,10 +1,16 @@
 #include "StochasticTransparencyOptions.h"
 
+#include <glbinding/gl/enum.h>
+
+#include <globjects/globjects.h>
+
 
 StochasticTransparencyOptions::StochasticTransparencyOptions()
 :   m_transparency{160u}
 ,   m_optimization{StochasticTransparencyOptimization::AlphaCorrection}
 ,   m_backFaceCulling{false}
+,   m_numSamples{8u}
+,   m_numSamplesChanged{true}
 {   
     addProperty<unsigned char>("transparency", this,
         &StochasticTransparencyOptions::transparency, 
@@ -22,9 +28,21 @@ StochasticTransparencyOptions::StochasticTransparencyOptions()
     addProperty<bool>("back_face_culling", this,
         &StochasticTransparencyOptions::backFaceCulling, 
         &StochasticTransparencyOptions::setBackFaceCulling);
+    
+    addProperty<uint16_t>("num_samples", this,
+        &StochasticTransparencyOptions::numSamples,
+        &StochasticTransparencyOptions::setNumSamples)->setOptions({
+        { "minimum", 1u }});
 }
 
 StochasticTransparencyOptions::~StochasticTransparencyOptions() = default;
+
+void StochasticTransparencyOptions::initGL()
+{
+    const auto maxNumSamples = globjects::getInteger(gl::GL_MAX_COLOR_TEXTURE_SAMPLES);
+    
+    property("num_samples")->setOption("maximum", static_cast<uint16_t>(maxNumSamples));
+}
 
 unsigned char StochasticTransparencyOptions::transparency() const
 {
@@ -54,4 +72,22 @@ bool StochasticTransparencyOptions::backFaceCulling() const
 void StochasticTransparencyOptions::setBackFaceCulling(bool b)
 {
     m_backFaceCulling = b;
+}
+
+uint16_t StochasticTransparencyOptions::numSamples() const
+{
+    return m_numSamples;
+}
+
+void StochasticTransparencyOptions::setNumSamples(uint16_t numSamples)
+{
+    m_numSamples = numSamples;
+    m_numSamplesChanged = true;
+}
+
+bool StochasticTransparencyOptions::numSamplesChanged() const
+{
+    const auto changed = m_numSamplesChanged;
+    m_numSamplesChanged = false;
+    return changed;
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <array>
 #include <bitset>
 #include <memory>
@@ -12,7 +13,7 @@ public:
     static constexpr auto s_alphaRes = 256u;
     static constexpr auto s_numMasks = 1024u;
 
-    using mask_t = unsigned char;
+    using mask_t = uint16_t;
     using maskDistribution_t = std::array<mask_t, s_numMasks>;
     
     using maskDistributions_t = std::array<maskDistribution_t, s_alphaRes>;
@@ -30,7 +31,7 @@ protected:
     void generateCombinations();
 
     void generateCombinationsForK(
-        const std::bitset<8> & combination,
+        const std::bitset<16> & combination,
         unsigned char offset,
         unsigned char k,
         std::vector<mask_t> & combinationMasks);

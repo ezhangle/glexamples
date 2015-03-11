@@ -89,6 +89,8 @@ void StochasticTransparency::onInitialize()
 
     debug() << "Using global OS X shader replacement '#version 140' -> '#version 150'" << std::endl;
 #endif
+
+    m_options->initGL();
     
     m_grid = make_ref<gloperate::AdaptiveGrid>();
     m_grid->setColor({0.6f, 0.6f, 0.6f});
@@ -117,6 +119,9 @@ void StochasticTransparency::onPaint()
         
         updateFramebuffer();
     }
+    
+    if (m_options->numSamplesChanged())
+        updateNumSamples();
     
     clearBuffers();
     updateUniforms();
@@ -212,6 +217,8 @@ void StochasticTransparency::setupPrograms()
     
     m_alphaToCoverageProgram->setUniform(kMasksTextureUniform, 0);
     
+    updateNumSamplesUniforms();
+    
     const auto opaqueColorLocation = m_compositingProgram->getUniformLocation("opaqueColorTexture");
     const auto totalAlphaLocation = m_compositingProgram->getUniformLocation("totalAlphaTexture");
     const auto transparentColorLocation = m_compositingProgram->getUniformLocation("transparentColorTexture");
@@ -225,22 +232,34 @@ void StochasticTransparency::setupPrograms()
 
 void StochasticTransparency::setupMasksTexture()
 {
-    static const auto numSamples = 8u;
+    static const auto numSamples = m_options->numSamples();
     const auto table = MasksTableGenerator::generateDistributions(numSamples);
     
     m_masksTexture = Texture::createDefault(GL_TEXTURE_2D);
-    m_masksTexture->image2D(0, GL_R8, table->at(0).size(), table->size(), 0, GL_RED, GL_UNSIGNED_BYTE, table->data());
+    m_masksTexture->image2D(0, GL_R16, table->at(0).size(), table->size(), 0, GL_RED, GL_UNSIGNED_SHORT, table->data());
 }
 
 void StochasticTransparency::updateFramebuffer()
 {
-    static const auto numSamples = 8u;
+    const auto numSamples = m_options->numSamples();
     const auto size = glm::ivec2{m_viewportCapability->width(), m_viewportCapability->height()};
     
     m_opaqueColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_FALSE);
     m_transparentColorAttachment->image2DMultisample(numSamples, GL_RGBA32F, size, GL_FALSE);
     m_totalAlphaAttachment->image2DMultisample(numSamples, GL_R32F, size, GL_FALSE);
     m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT24, size, GL_FALSE);
+}
+
+void StochasticTransparency::updateNumSamples()
+{
+    setupMasksTexture();
+    updateFramebuffer();
+    updateNumSamplesUniforms();
+}
+
+void StochasticTransparency::updateNumSamplesUniforms()
+{
+    m_compositingProgram->setUniform("numSamples", static_cast<int>(m_options->numSamples()));
 }
 
 void StochasticTransparency::clearBuffers()
