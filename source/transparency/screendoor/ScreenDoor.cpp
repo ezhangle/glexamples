@@ -71,19 +71,12 @@ ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
 
 ScreenDoor::~ScreenDoor() = default;
 
-reflectionzeug::PropertyGroup * ScreenDoor::properties() const
-{
-    return m_propertyGroup.get();
-}
-
 void ScreenDoor::setupPropertyGroup()
 {
-    m_propertyGroup = make_unique<reflectionzeug::PropertyGroup>();
-    
-    m_propertyGroup->addProperty<bool>("multisampling", this,
+    addProperty<bool>("multisampling", this,
         &ScreenDoor::multisampling, &ScreenDoor::setMultisampling);
     
-    m_propertyGroup->addProperty<float>("transparency", this,
+    addProperty<float>("transparency", this,
         &ScreenDoor::transparency, &ScreenDoor::setTransparency)->setOptions({
         { "minimum", 0.0f },
         { "maximum", 1.0f },
@@ -289,11 +282,11 @@ void ScreenDoor::updateFramebuffer()
     if (m_multisampling)
     {
         m_colorAttachment->image2DMultisample(numSamples, GL_RGBA8, width, height, GL_TRUE);
-        m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT24, width, height, GL_TRUE);
+        m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT, width, height, GL_TRUE);
     }
     else
     {
         m_colorAttachment->image2D(0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-        m_depthAttachment->image2D(0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
+        m_depthAttachment->image2D(0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
     }
 }

@@ -40,8 +40,6 @@ public:
     StochasticTransparency(gloperate::ResourceManager & resourceManager);
     virtual ~StochasticTransparency() override;
     
-    virtual reflectionzeug::PropertyGroup * properties() const override;
-    
 protected:
     virtual void onInitialize() override;
     virtual void onPaint() override;
