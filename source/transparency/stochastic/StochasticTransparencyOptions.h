@@ -7,13 +7,11 @@
 
 enum class StochasticTransparencyOptimization { NoOptimization, AlphaCorrection, AlphaCorrectionAndDepthBased };
 
-class StochasticTransparencyOptions : public reflectionzeug::PropertyGroup
+class StochasticTransparencyOptions
 {
 public:
     StochasticTransparencyOptions();
-    virtual ~StochasticTransparencyOptions() override;
-    
-    void initGL();
+    virtual ~StochasticTransparencyOptions();
 
     unsigned char transparency() const;
     void setTransparency(unsigned char transparency);

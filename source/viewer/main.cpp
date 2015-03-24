@@ -78,7 +78,7 @@ int main(int argc, char * argv[])
     QSurfaceFormat format;
     format.setVersion(3, 2);
     format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setDepthBufferSize(24);
+    format.setDepthBufferSize(16);
 
     QtOpenGLWindow * window = new QtOpenGLWindow(resourceManager, format);
     window->setPainter(painter.get());
@@ -102,10 +102,10 @@ int main(int argc, char * argv[])
     mainWindow.setCentralWidget(QWidget::createWindowContainer(window));
     mainWindow.centralWidget()->setFocusPolicy(Qt::StrongFocus);
 
-    if (painter->properties())
+    if (painter->count())
     {
         auto dockWidget = new QDockWidget{};
-        auto propertyBrowser = new propertyguizeug::PropertyBrowser{painter->properties()};
+        auto propertyBrowser = new propertyguizeug::PropertyBrowser{painter.get()};
         
         dockWidget->setWidget(propertyBrowser);
         mainWindow.addDockWidget(Qt::LeftDockWidgetArea, dockWidget);

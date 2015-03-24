@@ -37,8 +37,6 @@ public:
     ScreenDoor(gloperate::ResourceManager & resourceManager);
     virtual ~ScreenDoor();
     
-    virtual reflectionzeug::PropertyGroup * properties() const override;
-    
 public:
     void setupPropertyGroup();
     
@@ -80,8 +78,7 @@ protected:
     gl::GLint m_transformLocation;
     gl::GLint m_transparencyLocation;
     std::vector<std::unique_ptr<PolygonalDrawable>> m_drawables;
-    
-    std::unique_ptr<reflectionzeug::PropertyGroup> m_propertyGroup;
+
     bool m_multisampling;
     bool m_multisamplingChanged;
     float m_transparency;
