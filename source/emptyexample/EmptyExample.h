@@ -34,8 +34,8 @@ public:
     void setupProjection();
 
 protected:
-    virtual void onInitialize();
-    virtual void onPaint();
+    virtual void onInitialize() override;
+    virtual void onPaint() override;
     virtual void onTargetFramebufferChanged();
 
 protected:
