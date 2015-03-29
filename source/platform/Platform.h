@@ -10,6 +10,7 @@
 namespace globjects
 {
     class Program;
+    class Texture;
 }
 
 namespace gloperate
@@ -51,6 +52,7 @@ protected:
     /* members */
     globjects::ref_ptr<gloperate::AdaptiveGrid> m_grid;
     globjects::ref_ptr<globjects::Program> m_program;
+    globjects::ref_ptr<globjects::Texture> m_boxTexture;
     globjects::ref_ptr<HitmanBox> m_platform;
     gl::GLint m_transformLocation;
 };

@@ -10,6 +10,7 @@
 #include <globjects/logging.h>
 #include <globjects/DebugMessage.h>
 #include <globjects/Program.h>
+#include <globjects/Texture.h>
 
 #include <gloperate/base/RenderTargetType.h>
 
@@ -23,6 +24,7 @@
 #include <gloperate/primitives/AdaptiveGrid.h>
 
 #include "hitmanbox/HitmanBox.h"
+#include "RawFile.h"
 
 using namespace gl;
 using namespace glm;
@@ -81,6 +83,11 @@ void Platform::onInitialize()
     m_grid = new gloperate::AdaptiveGrid{};
     m_grid->setColor({0.6f, 0.6f, 0.6f});
 
+    RawFile raw("data/platform/wood-light.3096.2048.rgba.ub.raw");
+    m_boxTexture = Texture::createDefault(GL_TEXTURE_2D);
+    m_boxTexture->image2D(0, GL_RGBA8, ivec2(3096, 2048), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw.data());
+    m_boxTexture->setParameter(GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+
     m_platform = new HitmanBox();
 
     m_program = new Program{};
@@ -129,7 +136,9 @@ void Platform::onPaint()
     m_program->use();
     m_program->setUniform(m_transformLocation, transform);
 
+    m_boxTexture->bindActive(GL_TEXTURE0);
     m_platform->draw();
+    m_boxTexture->unbindActive(GL_TEXTURE0);
 
     m_program->release();
 

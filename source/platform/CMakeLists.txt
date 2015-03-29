@@ -38,12 +38,14 @@ set(source_path "${CMAKE_CURRENT_SOURCE_DIR}/")
 set(sources
     ${source_path}/Platform.cpp
     ${source_path}/hitmanbox/HitmanBox.cpp
+    ${source_path}/RawFile.cpp
     ${source_path}/plugin.cpp
 )
 
 set(api_includes
     ${include_path}/Platform.h
     ${include_path}/hitmanbox/HitmanBox.h
+    ${include_path}/RawFile.h
 )
 
 # Group source files
