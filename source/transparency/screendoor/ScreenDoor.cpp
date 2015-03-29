@@ -44,7 +44,7 @@ using namespace glm;
 using namespace globjects;
 
 ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
-:   Painter{resourceManager}
+:   Painter(resourceManager)
 ,   m_targetFramebufferCapability{new gloperate::TargetFramebufferCapability}
 ,   m_viewportCapability{new gloperate::ViewportCapability}
 ,   m_projectionCapability{new gloperate::PerspectiveProjectionCapability{m_viewportCapability}}
