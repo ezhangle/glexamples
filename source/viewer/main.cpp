@@ -26,7 +26,6 @@
 #include <gloperate-qt/QtWheelEventProvider.h>
 
 #include <propertyguizeug/PropertyBrowser.h>
-#include <widgetzeug/dark_fusion_style.hpp>
 
 #include "QtViewerMapping.h"
 
@@ -37,8 +36,6 @@ using namespace gloperate_qt;
 int main(int argc, char * argv[])
 {
     QApplication app(argc, argv);
-    widgetzeug::enableDarkFusionStyle();
-    
 
     ResourceManager resourceManager;
     resourceManager.addLoader(new QtTextureLoader());
@@ -81,7 +78,7 @@ int main(int argc, char * argv[])
     QSurfaceFormat format;
     format.setVersion(3, 2);
     format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setDepthBufferSize(24);
+    format.setDepthBufferSize(16);
 
     QtOpenGLWindow * window = new QtOpenGLWindow(resourceManager, format);
     window->setPainter(painter.get());
@@ -105,11 +102,14 @@ int main(int argc, char * argv[])
     mainWindow.setCentralWidget(QWidget::createWindowContainer(window));
     mainWindow.centralWidget()->setFocusPolicy(Qt::StrongFocus);
 
-    auto dockWidget = new QDockWidget{};
-    auto propertyBrowser = new propertyguizeug::PropertyBrowser{painter.get()};
-    
-    dockWidget->setWidget(propertyBrowser);
-    mainWindow.addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+    if (painter->count())
+    {
+        auto dockWidget = new QDockWidget{};
+        auto propertyBrowser = new propertyguizeug::PropertyBrowser{painter.get()};
+        
+        dockWidget->setWidget(propertyBrowser);
+        mainWindow.addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+    }
 
     mainWindow.show();
 

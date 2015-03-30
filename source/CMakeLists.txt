@@ -8,10 +8,10 @@ configure_file(glexamples-version.h.in ${CMAKE_CURRENT_BINARY_DIR}/glexamples-ve
 # External libraries
 find_package(OpenGL REQUIRED)
 find_package(GLM REQUIRED)
-find_package(GLBinding REQUIRED)
-find_package(GLObjects REQUIRED)
-find_package(GLOperate REQUIRED)
-find_package(Libzeug REQUIRED)
+find_package(glbinding REQUIRED)
+find_package(globjects REQUIRED)
+find_package(gloperate REQUIRED)
+find_package(libzeug REQUIRED)
 
 # Include directories
 include_directories(

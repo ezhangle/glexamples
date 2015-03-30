@@ -3,17 +3,9 @@ message(STATUS "Configuring for platform Linux/GCC.")
 
 # Enable C++11 support
 
-execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-    OUTPUT_VARIABLE GCC_VERSION)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 
-if(GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-elseif(GCC_VERSION VERSION_EQUAL 4.6)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-endif()
-
+include_directories("/usr/include/c++/v1/")
 
 set(LINUX_COMPILE_DEFS
     LINUX                     # Linux system
