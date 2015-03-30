@@ -86,32 +86,7 @@ void StochasticTransparency::onInitialize()
     debug() << "Using global OS X shader replacement '#version 140' -> '#version 150'" << std::endl;
 #endif
 
-    addProperty<unsigned char>("transparency", m_options.get(),
-        &StochasticTransparencyOptions::transparency,
-        &StochasticTransparencyOptions::setTransparency)->setOptions({
-        { "minimum", 0 },
-        { "maximum", 255 },
-        { "step", 1 }});
-
-    addProperty<StochasticTransparencyOptimization>("optimization", m_options.get(),
-        &StochasticTransparencyOptions::optimization,
-        &StochasticTransparencyOptions::setOptimization)->setStrings({
-        { StochasticTransparencyOptimization::NoOptimization, "NoOptimization" },
-        { StochasticTransparencyOptimization::AlphaCorrection, "AlphaCorrection" },
-        { StochasticTransparencyOptimization::AlphaCorrectionAndDepthBased, "AlphaCorrectionAndDepthBased" }});
-
-    addProperty<bool>("back_face_culling", m_options.get(),
-        &StochasticTransparencyOptions::backFaceCulling,
-        &StochasticTransparencyOptions::setBackFaceCulling);
-
-    addProperty<uint16_t>("num_samples", m_options.get(),
-        &StochasticTransparencyOptions::numSamples,
-        &StochasticTransparencyOptions::setNumSamples)->setOptions({
-        { "minimum", 1u }});
-
-    const auto maxNumSamples = globjects::getInteger(gl::GL_MAX_COLOR_TEXTURE_SAMPLES);
-
-    property("num_samples")->setOption("maximum", static_cast<uint16_t>(glm::min(8, maxNumSamples)));
+    m_options->initGL();
     
     m_grid = make_ref<gloperate::AdaptiveGrid>();
     m_grid->setColor({0.6f, 0.6f, 0.6f});
@@ -288,7 +263,7 @@ void StochasticTransparency::updateFramebuffer()
     m_opaqueColorAttachment->image2DMultisample(numSamples, GL_RGBA8, size, GL_FALSE);
     m_transparentColorAttachment->image2DMultisample(numSamples, GL_RGBA32F, size, GL_FALSE);
     m_totalAlphaAttachment->image2DMultisample(numSamples, GL_R32F, size, GL_FALSE);
-    m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT, size, GL_FALSE);
+    m_depthAttachment->image2DMultisample(numSamples, GL_DEPTH_COMPONENT16, size, GL_FALSE);
 }
 
 void StochasticTransparency::updateNumSamples()
