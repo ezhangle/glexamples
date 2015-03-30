@@ -5,13 +5,15 @@
 #include <reflectionzeug/PropertyGroup.h>
 
 
+class StochasticTransparency;
+
 enum class StochasticTransparencyOptimization { NoOptimization, AlphaCorrection, AlphaCorrectionAndDepthBased };
 
-class StochasticTransparencyOptions : public reflectionzeug::PropertyGroup
+class StochasticTransparencyOptions
 {
 public:
-    StochasticTransparencyOptions();
-    virtual ~StochasticTransparencyOptions() override;
+    StochasticTransparencyOptions(StochasticTransparency & painter);
+    ~StochasticTransparencyOptions();
     
     void initGL();
 
@@ -30,6 +32,8 @@ public:
     bool numSamplesChanged() const;
 
 private:
+    StochasticTransparency & m_painter;
+
     unsigned char m_transparency;
     StochasticTransparencyOptimization m_optimization;
     bool m_backFaceCulling;

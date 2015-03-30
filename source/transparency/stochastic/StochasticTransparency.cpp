@@ -40,12 +40,13 @@
 #include "../AssimpProcessing.h"
 #include "../PolygonalDrawable.h"
 #include "../PolygonalGeometry.h"
-#include "../util.hpp"
 
 
 using namespace gl;
 using namespace glm;
 using namespace globjects;
+
+using reflectionzeug::make_unique;
 
 StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & resourceManager)
 :   Painter{resourceManager}
@@ -55,7 +56,7 @@ StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & reso
 ,   m_typedRenderTargetCapability{new gloperate::TypedRenderTargetCapability{}}
 ,   m_cameraCapability{new gloperate::CameraCapability{}}
 ,   m_timeCapability{new gloperate::VirtualTimeCapability}
-,   m_options{make_unique<StochasticTransparencyOptions>()}
+,   m_options{make_unique<StochasticTransparencyOptions>(*this)}
 {
     m_timeCapability->setLoopDuration(20.0f * pi<float>());
 
@@ -70,11 +71,6 @@ StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & reso
 }
 
 StochasticTransparency::~StochasticTransparency() = default;
-
-reflectionzeug::PropertyGroup * StochasticTransparency::properties() const
-{
-    return m_options.get();
-}
 
 void StochasticTransparency::onInitialize()
 {

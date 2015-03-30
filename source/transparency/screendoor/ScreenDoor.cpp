@@ -71,19 +71,12 @@ ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
 
 ScreenDoor::~ScreenDoor() = default;
 
-reflectionzeug::PropertyGroup * ScreenDoor::properties() const
-{
-    return m_propertyGroup.get();
-}
-
 void ScreenDoor::setupPropertyGroup()
 {
-    m_propertyGroup = make_unique<reflectionzeug::PropertyGroup>();
-    
-    m_propertyGroup->addProperty<bool>("multisampling", this,
+    addProperty<bool>("multisampling", this,
         &ScreenDoor::multisampling, &ScreenDoor::setMultisampling);
     
-    m_propertyGroup->addProperty<float>("transparency", this,
+    addProperty<float>("transparency", this,
         &ScreenDoor::transparency, &ScreenDoor::setTransparency)->setOptions({
         { "minimum", 0.0f },
         { "maximum", 1.0f },
