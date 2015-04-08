@@ -26,7 +26,6 @@ namespace gloperate
     class AbstractViewportCapability;
     class AbstractPerspectiveProjectionCapability;
     class AbstractCameraCapability;
-    class TypedRenderTargetCapability;
     class ScreenAlignedQuad;
 }
 
@@ -42,8 +41,6 @@ public:
 protected:
     virtual void onInitialize() override;
     virtual void onPaint() override;
-
-    void onTargetFramebufferChanged();
 
 protected:
     void setupFramebuffer();
@@ -70,11 +67,10 @@ private:
     /** \name Capabilities */
     /** \{ */
     
-    gloperate::AbstractTargetFramebufferCapability * m_targetFramebufferCapability;
-    gloperate::AbstractViewportCapability * m_viewportCapability;
-    gloperate::AbstractPerspectiveProjectionCapability * m_projectionCapability;
-    gloperate::TypedRenderTargetCapability * m_typedRenderTargetCapability;
-    gloperate::AbstractCameraCapability * m_cameraCapability;
+    std::unique_ptr<gloperate::AbstractTargetFramebufferCapability> m_targetFramebufferCapability;
+    std::unique_ptr<gloperate::AbstractViewportCapability> m_viewportCapability;
+    std::unique_ptr<gloperate::AbstractPerspectiveProjectionCapability> m_projectionCapability;
+    std::unique_ptr<gloperate::AbstractCameraCapability> m_cameraCapability;
     
     /** \} */
 

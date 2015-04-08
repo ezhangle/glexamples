@@ -25,7 +25,6 @@
 #include <gloperate/painter/ViewportCapability.h>
 #include <gloperate/painter/PerspectiveProjectionCapability.h>
 #include <gloperate/painter/CameraCapability.h>
-#include <gloperate/painter/TypedRenderTargetCapability.h>
 
 #include <gloperate/primitives/AdaptiveGrid.h>
 
@@ -46,22 +45,18 @@ using widgetzeug::make_unique;
 
 ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
 :   Painter{resourceManager}
-,   m_targetFramebufferCapability{new gloperate::TargetFramebufferCapability}
-,   m_viewportCapability{new gloperate::ViewportCapability}
-,   m_projectionCapability{new gloperate::PerspectiveProjectionCapability{m_viewportCapability}}
-,   m_typedRenderTargetCapability{new gloperate::TypedRenderTargetCapability{}}
-,   m_cameraCapability{new gloperate::CameraCapability{}}
+,   m_targetFramebufferCapability{make_unique<gloperate::TargetFramebufferCapability>()}
+,   m_viewportCapability{make_unique<gloperate::ViewportCapability>()}
+,   m_projectionCapability{make_unique<gloperate::PerspectiveProjectionCapability>(m_viewportCapability.get())}
+,   m_cameraCapability{make_unique<gloperate::CameraCapability>()}
 ,   m_multisampling{false}
 ,   m_multisamplingChanged{false}
 ,   m_transparency{0.5}
 {
-    m_targetFramebufferCapability->changed.connect(this, &ScreenDoor::onTargetFramebufferChanged);
-
-    addCapability(m_targetFramebufferCapability);
-    addCapability(m_viewportCapability);
-    addCapability(m_projectionCapability);
-    addCapability(m_cameraCapability);
-    addCapability(m_typedRenderTargetCapability);
+    addCapability(m_targetFramebufferCapability.get());
+    addCapability(m_viewportCapability.get());
+    addCapability(m_projectionCapability.get());
+    addCapability(m_cameraCapability.get());
     
     setupPropertyGroup();
 }
@@ -106,7 +101,6 @@ void ScreenDoor::onInitialize()
 {
     globjects::init();
     globjects::DebugMessage::enable();
-    onTargetFramebufferChanged();
 
 #ifdef __APPLE__
     Shader::clearGlobalReplacements();
@@ -194,17 +188,6 @@ void ScreenDoor::onPaint()
     
     m_fbo->blit(GL_COLOR_ATTACHMENT0, rect, targetfbo, drawBuffer, rect,
         GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-}
-
-void ScreenDoor::onTargetFramebufferChanged()
-{
-    auto fbo = m_targetFramebufferCapability->framebuffer();
-
-    if (!fbo)
-        fbo = globjects::Framebuffer::defaultFBO();
-
-    m_typedRenderTargetCapability->setRenderTarget(gloperate::RenderTargetType::Depth, fbo,
-        GLenum::GL_DEPTH_ATTACHMENT, GLenum::GL_DEPTH_COMPONENT);
 }
 
 void ScreenDoor::setupFramebuffer()
