@@ -34,17 +34,13 @@ EmptyExample::EmptyExample(gloperate::ResourceManager & resourceManager)
 ,   m_projectionCapability{new gloperate::PerspectiveProjectionCapability{m_viewportCapability}}
 ,   m_typedRenderTargetCapability{new gloperate::TypedRenderTargetCapability{}}
 ,   m_cameraCapability{new gloperate::CameraCapability{}}
-,   m_timeCapability{new gloperate::VirtualTimeCapability}
 {
-    m_timeCapability->setLoopDuration(20.0f * pi<float>());
-
     m_targetFramebufferCapability->changed.connect([this](){ this->onTargetFramebufferChanged();});
 
     addCapability(m_targetFramebufferCapability);
     addCapability(m_viewportCapability);
     addCapability(m_projectionCapability);
     addCapability(m_cameraCapability);
-    addCapability(m_timeCapability);
     addCapability(m_typedRenderTargetCapability);
 }
 

@@ -5,8 +5,10 @@
 
 #include <glm/common.hpp>
 
-#include "../util.hpp"
+#include <widgetzeug/make_unique.hpp>
 
+
+using widgetzeug::make_unique;
 
 auto MasksTableGenerator::generateDistributions(unsigned int numSamples) -> std::unique_ptr<maskDistributions_t>
 {

@@ -25,7 +25,6 @@ namespace gloperate
     class AbstractPerspectiveProjectionCapability;
     class AbstractCameraCapability;
     class TypedRenderTargetCapability;
-    class AbstractVirtualTimeCapability;
 }
 
 class PolygonalDrawable;
@@ -65,7 +64,6 @@ protected:
     gloperate::AbstractPerspectiveProjectionCapability * m_projectionCapability;
     gloperate::TypedRenderTargetCapability * m_typedRenderTargetCapability;
     gloperate::AbstractCameraCapability * m_cameraCapability;
-    gloperate::AbstractVirtualTimeCapability * m_timeCapability;
 
     /* members */
     globjects::ref_ptr<globjects::Framebuffer> m_fbo;

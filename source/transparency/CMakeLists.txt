@@ -60,7 +60,6 @@ set(api_includes
     ${include_path}/AssimpProcessing.h
     ${include_path}/PolygonalDrawable.h
     ${include_path}/PolygonalGeometry.h
-    ${include_path}/util.hpp
     ${include_path}/screendoor/ScreenDoor.h
     ${include_path}/stochastic/StochasticTransparency.h
     ${include_path}/stochastic/StochasticTransparencyOptions.h
