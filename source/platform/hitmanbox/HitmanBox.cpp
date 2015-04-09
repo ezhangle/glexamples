@@ -23,10 +23,7 @@ std::vector<vec3> HitmanBox::vertices(const gl::GLfloat size, const gl::GLfloat 
 {
     const gl::GLfloat x = size / 2;
     const gl::GLfloat y = height / 2;
-
     const gl::GLfloat total = size + 4*height + 2*offset;
-    const gl::GLfloat half = (total/2)/total;
-    const gl::GLfloat edgehalf = height+offset+height/2;
 
     const gl::GLfloat c0 = 0;
     const gl::GLfloat c1 = height/total;
@@ -35,142 +32,197 @@ std::vector<vec3> HitmanBox::vertices(const gl::GLfloat size, const gl::GLfloat 
     const gl::GLfloat c4 = (2*height+2*offset)/total;
     const gl::GLfloat c5 = (size+2*height)/total;
     const gl::GLfloat c6 = (size+2*height+offset)/total;
+    const gl::GLfloat c7 = (size+3*height+offset)/total;
+    const gl::GLfloat c8 = (size+3*height+2*offset)/total;
+    const gl::GLfloat c9 = (size+4*height+2*offset)/total;
 
-    auto mirror = [&] (const gl::GLfloat point, const gl::GLfloat axis, const gl::GLfloat direction) {
-        return axis - direction*axis + direction*point;
+
+    return {
+        
+    // plus Z (frontface)
+        vec3( x, y, x), vec3(0,0,1), vec3(c6, c3, 0)
+    ,   vec3(-x, y, x), vec3(0,0,1), vec3(c3, c3, 0)
+    ,   vec3(-x,-y, x), vec3(0,0,1), vec3(c3, c2, 0)
+    ,   vec3(-x,-y, x), vec3(0,0,1), vec3(c3, c2, 0)
+    ,   vec3( x,-y, x), vec3(0,0,1), vec3(c6, c2, 0)
+    ,   vec3( x, y, x), vec3(0,0,1), vec3(c6, c3, 0)
+
+    // plus Z (backface)
+    ,   vec3( x-offset, y, x-offset ), vec3(0,0,-1), vec3(c5, c0, 0)
+    ,   vec3(-x+offset,-y, x-offset ), vec3(0,0,-1), vec3(c4, c1, 0)
+    ,   vec3(-x+offset, y, x-offset ), vec3(0,0,-1), vec3(c4, c0, 0)
+    ,   vec3( x-offset, y, x-offset ), vec3(0,0,-1), vec3(c5, c0, 0)
+    ,   vec3( x-offset,-y, x-offset ), vec3(0,0,-1), vec3(c5, c1, 0)
+    ,   vec3(-x+offset,-y, x-offset ), vec3(0,0,-1), vec3(c4, c1, 0)
+
+    // plus Z (top)
+    ,   vec3(-x       , y, x       ), vec3(0,1,0),  vec3(c3, c3, 0)
+    ,   vec3(-x+offset, y, x       ), vec3(0,1,0),  vec3(c4, c3, 0)
+    ,   vec3(-x+offset, y, x-offset), vec3(0,1,0),  vec3(c4, c4, 0)
+    ,   vec3( x-offset, y, x       ), vec3(0,1,0),  vec3(c5, c3, 0)
+    ,   vec3( x       , y, x       ), vec3(0,1,0),  vec3(c6, c3, 0)
+    ,   vec3( x-offset, y, x-offset), vec3(0,1,0),  vec3(c5, c4, 0)
+    ,   vec3(-x+offset, y, x       ), vec3(0,1,0),  vec3(c4, c3, 0)
+    ,   vec3( x-offset, y, x       ), vec3(0,1,0),  vec3(c5, c3, 0)
+    ,   vec3( x-offset, y, x-offset), vec3(0,1,0),  vec3(c5, c4, 0)
+    ,   vec3(-x+offset, y, x       ), vec3(0,1,0),  vec3(c4, c3, 0)
+    ,   vec3( x-offset, y, x-offset), vec3(0,1,0),  vec3(c5, c4, 0)
+    ,   vec3(-x+offset, y, x-offset), vec3(0,1,0),  vec3(c4, c4, 0)
+
+    // plus Z (bottom)
+    ,   vec3(-x       ,-y, x       ), vec3(0,-1,0), vec3(c3, c2, 0)
+    ,   vec3(-x+offset,-y, x-offset), vec3(0,-1,0), vec3(c4, c1, 0)
+    ,   vec3(-x+offset,-y, x       ), vec3(0,-1,0), vec3(c4, c2, 0)
+    ,   vec3( x-offset,-y, x       ), vec3(0,-1,0), vec3(c5, c2, 0)
+    ,   vec3( x-offset,-y, x-offset), vec3(0,-1,0), vec3(c5, c1, 0)
+    ,   vec3( x       ,-y, x       ), vec3(0,-1,0), vec3(c6, c2, 0)
+    ,   vec3(-x+offset,-y, x       ), vec3(0,-1,0), vec3(c4, c2, 0)
+    ,   vec3( x-offset,-y, x-offset), vec3(0,-1,0), vec3(c5, c1, 0)
+    ,   vec3( x-offset,-y, x       ), vec3(0,-1,0), vec3(c5, c2, 0)
+    ,   vec3(-x+offset,-y, x       ), vec3(0,-1,0), vec3(c4, c2, 0)
+    ,   vec3(-x+offset,-y, x-offset), vec3(0,-1,0), vec3(c4, c1, 0)
+    ,   vec3( x-offset,-y, x-offset), vec3(0,-1,0), vec3(c5, c1, 0)
+
+    // minus Z (frontface)
+    ,   vec3( x, y, -x), vec3(0,0,-1), vec3(c6, c6, 0)
+    ,   vec3(-x,-y, -x), vec3(0,0,-1), vec3(c3, c7, 0)
+    ,   vec3(-x, y, -x), vec3(0,0,-1), vec3(c3, c6, 0)
+    ,   vec3(-x,-y, -x), vec3(0,0,-1), vec3(c3, c7, 0)
+    ,   vec3( x, y, -x), vec3(0,0,-1), vec3(c6, c6, 0)
+    ,   vec3( x,-y, -x), vec3(0,0,-1), vec3(c6, c7, 0)
+
+    // minus Z (backface)
+    ,   vec3( x-offset, y, -x+offset ), vec3(0,0,1), vec3(c5, c9, 0)
+    ,   vec3(-x+offset, y, -x+offset ), vec3(0,0,1), vec3(c4, c9, 0)
+    ,   vec3(-x+offset,-y, -x+offset ), vec3(0,0,1), vec3(c4, c8, 0)
+    ,   vec3( x-offset, y, -x+offset ), vec3(0,0,1), vec3(c5, c9, 0)
+    ,   vec3(-x+offset,-y, -x+offset ), vec3(0,0,1), vec3(c4, c8, 0)
+    ,   vec3( x-offset,-y, -x+offset ), vec3(0,0,1), vec3(c5, c8, 0)
+
+    // minus Z (top)
+    ,   vec3(-x       , y, -x       ), vec3(0,1,0),  vec3(c3, c6, 0)
+    ,   vec3(-x+offset, y, -x+offset), vec3(0,1,0),  vec3(c4, c5, 0)
+    ,   vec3(-x+offset, y, -x       ), vec3(0,1,0),  vec3(c4, c6, 0)
+    ,   vec3( x-offset, y, -x       ), vec3(0,1,0),  vec3(c5, c6, 0)
+    ,   vec3( x-offset, y, -x+offset), vec3(0,1,0),  vec3(c5, c5, 0)
+    ,   vec3( x       , y, -x       ), vec3(0,1,0),  vec3(c6, c6, 0)
+    ,   vec3(-x+offset, y, -x       ), vec3(0,1,0),  vec3(c4, c6, 0)
+    ,   vec3( x-offset, y, -x+offset), vec3(0,1,0),  vec3(c5, c5, 0)
+    ,   vec3( x-offset, y, -x       ), vec3(0,1,0),  vec3(c5, c6, 0)
+    ,   vec3(-x+offset, y, -x       ), vec3(0,1,0),  vec3(c4, c6, 0)
+    ,   vec3(-x+offset, y, -x+offset), vec3(0,1,0),  vec3(c4, c5, 0)
+    ,   vec3( x-offset, y, -x+offset), vec3(0,1,0),  vec3(c5, c5, 0)
+
+    // minus Z (bottom)
+    ,   vec3(-x       ,-y, -x       ), vec3(0,-1,0), vec3(c3, c7, 0)
+    ,   vec3(-x+offset,-y, -x       ), vec3(0,-1,0), vec3(c4, c7, 0)
+    ,   vec3(-x+offset,-y, -x+offset), vec3(0,-1,0), vec3(c4, c8, 0)
+    ,   vec3( x-offset,-y, -x       ), vec3(0,-1,0), vec3(c5, c7, 0)
+    ,   vec3( x       ,-y, -x       ), vec3(0,-1,0), vec3(c6, c7, 0)
+    ,   vec3( x-offset,-y, -x+offset), vec3(0,-1,0), vec3(c5, c8, 0)
+    ,   vec3(-x+offset,-y, -x       ), vec3(0,-1,0), vec3(c4, c7, 0)
+    ,   vec3( x-offset,-y, -x       ), vec3(0,-1,0), vec3(c5, c7, 0)
+    ,   vec3( x-offset,-y, -x+offset), vec3(0,-1,0), vec3(c5, c8, 0)
+    ,   vec3(-x+offset,-y, -x       ), vec3(0,-1,0), vec3(c4, c7, 0)
+    ,   vec3( x-offset,-y, -x+offset), vec3(0,-1,0), vec3(c5, c8, 0)
+    ,   vec3(-x+offset,-y, -x+offset), vec3(0,-1,0), vec3(c4, c8, 0)
+
+    // plus X (frontface)
+    ,   vec3( x,-y, x), vec3(1,0,0), vec3(c7, c3, 0)
+    ,   vec3( x, y,-x), vec3(1,0,0), vec3(c6, c6, 0)
+    ,   vec3( x, y, x), vec3(1,0,0), vec3(c6, c3, 0)
+    ,   vec3( x,-y, x), vec3(1,0,0), vec3(c7, c3, 0)
+    ,   vec3( x,-y,-x), vec3(1,0,0), vec3(c7, c6, 0)
+    ,   vec3( x, y,-x), vec3(1,0,0), vec3(c6, c6, 0)
+
+    // plus X (backface)
+    ,   vec3( x-offset, y, x-offset ), vec3(-1,0,0), vec3(c9, c4, 0)
+    ,   vec3( x-offset,-y,-x+offset ), vec3(-1,0,0), vec3(c8, c5, 0)
+    ,   vec3( x-offset,-y, x-offset ), vec3(-1,0,0), vec3(c8, c4, 0)
+    ,   vec3( x-offset, y, x-offset ), vec3(-1,0,0), vec3(c9, c4, 0)
+    ,   vec3( x-offset, y,-x+offset ), vec3(-1,0,0), vec3(c9, c5, 0)
+    ,   vec3( x-offset,-y,-x+offset ), vec3(-1,0,0), vec3(c8, c5, 0)
+
+    // plus X (top)
+    ,   vec3( x         , y, x        ), vec3(0,1,0), vec3(c6, c3, 0)
+    ,   vec3( x         , y, x-offset ), vec3(0,1,0), vec3(c6, c4, 0)
+    ,   vec3( x-offset  , y, x-offset ), vec3(0,1,0), vec3(c5, c4, 0)
+    ,   vec3( x         , y,-x+offset ), vec3(0,1,0), vec3(c6, c5, 0)
+    ,   vec3( x         , y,-x        ), vec3(0,1,0), vec3(c6, c6, 0)
+    ,   vec3( x-offset  , y,-x+offset ), vec3(0,1,0), vec3(c5, c5, 0)
+    ,   vec3( x-offset  , y, x-offset ), vec3(0,1,0), vec3(c5, c4, 0)
+    ,   vec3( x         , y, x-offset ), vec3(0,1,0), vec3(c6, c4, 0)
+    ,   vec3( x         , y,-x+offset ), vec3(0,1,0), vec3(c6, c5, 0)
+    ,   vec3( x-offset  , y, x-offset ), vec3(0,1,0), vec3(c5, c4, 0)
+    ,   vec3( x         , y,-x+offset ), vec3(0,1,0), vec3(c6, c5, 0)
+    ,   vec3( x-offset  , y,-x+offset ), vec3(0,1,0), vec3(c5, c5, 0)
+
+    // plus X (bottom)
+    ,   vec3( x         , -y, x        ), vec3(0,-1,0), vec3(c7, c3, 0)
+    ,   vec3( x-offset  , -y, x-offset ), vec3(0,-1,0), vec3(c8, c4, 0)
+    ,   vec3( x         , -y, x-offset ), vec3(0,-1,0), vec3(c7, c4, 0)
+    ,   vec3( x         , -y,-x+offset ), vec3(0,-1,0), vec3(c7, c5, 0)
+    ,   vec3( x-offset  , -y,-x+offset ), vec3(0,-1,0), vec3(c8, c5, 0)
+    ,   vec3( x         , -y,-x        ), vec3(0,-1,0), vec3(c7, c6, 0)
+    ,   vec3( x-offset  , -y, x-offset ), vec3(0,-1,0), vec3(c8, c4, 0)
+    ,   vec3( x         , -y,-x+offset ), vec3(0,-1,0), vec3(c7, c5, 0)
+    ,   vec3( x         , -y, x-offset ), vec3(0,-1,0), vec3(c7, c4, 0)
+    ,   vec3( x-offset  , -y, x-offset ), vec3(0,-1,0), vec3(c8, c4, 0)
+    ,   vec3( x-offset  , -y,-x+offset ), vec3(0,-1,0), vec3(c8, c5, 0)
+    ,   vec3( x         , -y,-x+offset ), vec3(0,-1,0), vec3(c7, c5, 0)
+
+    // minus X (frontface)
+    ,   vec3(-x,-y, x), vec3(-1,0,0), vec3(c2, c3, 0)
+    ,   vec3(-x, y, x), vec3(-1,0,0), vec3(c3, c3, 0)
+    ,   vec3(-x, y,-x), vec3(-1,0,0), vec3(c3, c6, 0)
+    ,   vec3(-x,-y, x), vec3(-1,0,0), vec3(c2, c3, 0)
+    ,   vec3(-x, y,-x), vec3(-1,0,0), vec3(c3, c6, 0)
+    ,   vec3(-x,-y,-x), vec3(-1,0,0), vec3(c2, c6, 0)
+
+    // minus X (backface)
+    ,   vec3(-x+offset, y, x-offset ), vec3(1,0,0), vec3(c0, c4, 0)
+    ,   vec3(-x+offset,-y, x-offset ), vec3(1,0,0), vec3(c1, c4, 0)
+    ,   vec3(-x+offset,-y,-x+offset ), vec3(1,0,0), vec3(c1, c5, 0)
+    ,   vec3(-x+offset, y, x-offset ), vec3(1,0,0), vec3(c0, c4, 0)
+    ,   vec3(-x+offset,-y,-x+offset ), vec3(1,0,0), vec3(c1, c5, 0)
+    ,   vec3(-x+offset, y,-x+offset ), vec3(1,0,0), vec3(c0, c5, 0)
+
+    // minus X (top)
+    ,   vec3(-x         , y, x        ), vec3(0,1,0), vec3(c3, c3, 0)
+    ,   vec3(-x+offset  , y, x-offset ), vec3(0,1,0), vec3(c4, c4, 0)
+    ,   vec3(-x         , y, x-offset ), vec3(0,1,0), vec3(c3, c4, 0)
+    ,   vec3(-x         , y,-x+offset ), vec3(0,1,0), vec3(c3, c5, 0)
+    ,   vec3(-x+offset  , y,-x+offset ), vec3(0,1,0), vec3(c4, c5, 0)
+    ,   vec3(-x         , y,-x        ), vec3(0,1,0), vec3(c3, c6, 0)
+    ,   vec3(-x+offset  , y, x-offset ), vec3(0,1,0), vec3(c4, c4, 0)
+    ,   vec3(-x         , y,-x+offset ), vec3(0,1,0), vec3(c3, c5, 0)
+    ,   vec3(-x         , y, x-offset ), vec3(0,1,0), vec3(c3, c4, 0)
+    ,   vec3(-x+offset  , y, x-offset ), vec3(0,1,0), vec3(c4, c4, 0)
+    ,   vec3(-x+offset  , y,-x+offset ), vec3(0,1,0), vec3(c4, c5, 0)
+    ,   vec3(-x         , y,-x+offset ), vec3(0,1,0), vec3(c3, c5, 0)
+
+    // minus X (bottom)
+    ,   vec3(-x         , -y, x        ), vec3(0,-1,0), vec3(c2, c3, 0)
+    ,   vec3(-x         , -y, x-offset ), vec3(0,-1,0), vec3(c2, c4, 0)
+    ,   vec3(-x+offset  , -y, x-offset ), vec3(0,-1,0), vec3(c1, c4, 0)
+    ,   vec3(-x         , -y,-x+offset ), vec3(0,-1,0), vec3(c2, c5, 0)
+    ,   vec3(-x         , -y,-x        ), vec3(0,-1,0), vec3(c2, c6, 0)
+    ,   vec3(-x+offset  , -y,-x+offset ), vec3(0,-1,0), vec3(c1, c5, 0)
+    ,   vec3(-x+offset  , -y, x-offset ), vec3(0,-1,0), vec3(c1, c4, 0)
+    ,   vec3(-x         , -y, x-offset ), vec3(0,-1,0), vec3(c2, c4, 0)
+    ,   vec3(-x         , -y,-x+offset ), vec3(0,-1,0), vec3(c2, c5, 0)
+    ,   vec3(-x+offset  , -y, x-offset ), vec3(0,-1,0), vec3(c1, c4, 0)
+    ,   vec3(-x         , -y,-x+offset ), vec3(0,-1,0), vec3(c2, c5, 0)
+    ,   vec3(-x+offset  , -y,-x+offset ), vec3(0,-1,0), vec3(c1, c5, 0)
+
+    // plate
+    ,   vec3(-x+offset, y-(offset/2), x-offset), vec3(0,1,0), vec3(c4, c4, 0)
+    ,   vec3( x-offset, y-(offset/2), x-offset), vec3(0,1,0), vec3(c5, c4, 0)
+    ,   vec3( x-offset, y-(offset/2),-x+offset), vec3(0,1,0), vec3(c5, c5, 0)
+    ,   vec3(-x+offset, y-(offset/2), x-offset), vec3(0,1,0), vec3(c4, c4, 0)
+    ,   vec3( x-offset, y-(offset/2),-x+offset), vec3(0,1,0), vec3(c5, c5, 0)
+    ,   vec3(-x+offset, y-(offset/2),-x+offset), vec3(0,1,0), vec3(c4, c5, 0)
     };
-
-    auto face_z = [&] (const vec3 d) {
-
-        auto texvec = [&] (const gl::GLfloat point1, const gl::GLfloat point2) {
-            return vec3(point1, mirror(point2, half, d.z), 0);
-        };
-
-        return std::vector<vec3>{
-            vec3( x, y, x*d.z), d, texvec(c6, c3)
-        ,   vec3(-x, y, x*d.z), d, texvec(c3, c3)
-        ,   vec3(-x,-y, x*d.z), d, texvec(c3, c2)
-        ,   vec3(-x,-y, x*d.z), d, texvec(c3, c2)
-        ,   vec3( x,-y, x*d.z), d, texvec(c6, c2)
-        ,   vec3( x, y, x*d.z), d, texvec(c6, c3)
-
-        ,   vec3( x-offset, y, (x-offset)*d.z ), -d, texvec(c5, c0)
-        ,   vec3(-x+offset,-y, (x-offset)*d.z ), -d, texvec(c4, c1)
-        ,   vec3(-x+offset, y, (x-offset)*d.z ), -d, texvec(c4, c0)
-        ,   vec3( x-offset, y, (x-offset)*d.z ), -d, texvec(c5, c0)
-        ,   vec3( x-offset,-y, (x-offset)*d.z ), -d, texvec(c5, c1)
-        ,   vec3(-x+offset,-y, (x-offset)*d.z ), -d, texvec(c4, c1)
-        };
-    };
-
-    auto face_x = [&] (const vec3 d) {
-
-        auto texvec = [&] (const gl::GLfloat point1, const gl::GLfloat point2) {
-            return vec3(mirror(point1, half, -d.x), point2, 0);
-        };
-
-        return std::vector<vec3>{
-            vec3( x*d.x,-y, x), d, texvec(c2, c3)
-        ,   vec3( x*d.x, y,-x), d, texvec(c3, c6)
-        ,   vec3( x*d.x, y, x), d, texvec(c3, c3)
-        ,   vec3( x*d.x,-y, x), d, texvec(c2, c3)
-        ,   vec3( x*d.x,-y,-x), d, texvec(c2, c6)
-        ,   vec3( x*d.x, y,-x), d, texvec(c3, c6)
-
-        ,   vec3( (x-offset)*d.x, y, x-offset ), -d, texvec(c0, c4)
-        ,   vec3( (x-offset)*d.x,-y, x-offset ), -d, texvec(c1, c4)
-        ,   vec3( (x-offset)*d.x,-y,-x+offset ), -d, texvec(c1, c5)
-        ,   vec3( (x-offset)*d.x, y, x-offset ), -d, texvec(c0, c4)
-        ,   vec3( (x-offset)*d.x,-y,-x+offset ), -d, texvec(c1, c5)
-        ,   vec3( (x-offset)*d.x, y,-x+offset ), -d, texvec(c0, c5)
-        };
-    };
-
-    auto edge_z = [&] (const vec3 d, const vec3 n) {
-
-        auto texvec = [&] (const gl::GLfloat point1, const gl::GLfloat point2) {
-            return vec3(point1, mirror(mirror(point2, edgehalf, n.y), half, d.z), 0);
-        };
-
-        return std::vector<vec3>{
-            vec3(-x       , n.y*y, d.z*x          ), n, texvec(c3, c3)
-        ,   vec3(-x+offset, n.y*y, d.z*x          ), n, texvec(c4, c3)
-        ,   vec3(-x+offset, n.y*y, d.z*(x-offset) ), n, texvec(c4, c4)
-        ,   vec3( x-offset, n.y*y, d.z*x          ), n, texvec(c5, c3)
-        ,   vec3( x       , n.y*y, d.z*x          ), n, texvec(c6, c3)
-        ,   vec3( x-offset, n.y*y, d.z*(x-offset) ), n, texvec(c5, c4)
-
-        ,   vec3(-x+offset, n.y*y, d.z*x          ), n, texvec(c4, c3)
-        ,   vec3( x-offset, n.y*y, d.z*x          ), n, texvec(c5, c3)
-        ,   vec3( x-offset, n.y*y, d.z*(x-offset) ), n, texvec(c5, c4)
-        ,   vec3(-x+offset, n.y*y, d.z*x          ), n, texvec(c4, c3)
-        ,   vec3( x-offset, n.y*y, d.z*(x-offset) ), n, texvec(c5, c4)
-        ,   vec3(-x+offset, n.y*y, d.z*(x-offset) ), n, texvec(c4, c4)
-        };
-    };
-
-    auto edge_x = [&] (const vec3 d, const vec3 n) {
-
-        auto texvec = [&] (const gl::GLfloat point1, const gl::GLfloat point2) {
-            return vec3(mirror(mirror(point1, edgehalf, n.y), half, -d.x), point2, 0);
-        };
-
-        return std::vector<vec3>{
-            vec3( d.x*x         , n.y*y, x        ), n, texvec(c3, c3)
-        ,   vec3( d.x*x         , n.y*y, x-offset ), n, texvec(c3, c4)
-        ,   vec3( d.x*(x-offset), n.y*y, x-offset ), n, texvec(c4, c4)
-        ,   vec3( d.x*x         , n.y*y,-x+offset ), n, texvec(c3, c5)
-        ,   vec3( d.x*x         , n.y*y,-x        ), n, texvec(c3, c6)
-        ,   vec3( d.x*(x-offset), n.y*y,-x+offset ), n, texvec(c4, c5)
-
-        ,   vec3( d.x*(x-offset), n.y*y, x-offset ), n, texvec(c4, c4)
-        ,   vec3( d.x*x         , n.y*y, x-offset ), n, texvec(c3, c4)
-        ,   vec3( d.x*x         , n.y*y,-x+offset ), n, texvec(c3, c5)
-        ,   vec3( d.x*(x-offset), n.y*y, x-offset ), n, texvec(c4, c4)
-        ,   vec3( d.x*x         , n.y*y,-x+offset ), n, texvec(c3, c5)
-        ,   vec3( d.x*(x-offset), n.y*y,-x+offset ), n, texvec(c4, c5)
-        };
-    };
-
-    auto plate = [&] (const vec3 n) {
-        return std::vector<vec3>{
-            vec3(-x+offset, y-(offset/2), x-offset), n, vec3(c4, c4, 0)
-        ,   vec3( x-offset, y-(offset/2), x-offset), n, vec3(c5, c4, 0)
-        ,   vec3( x-offset, y-(offset/2),-x+offset), n, vec3(c5, c5, 0)
-        ,   vec3(-x+offset, y-(offset/2), x-offset), n, vec3(c4, c4, 0)
-        ,   vec3( x-offset, y-(offset/2),-x+offset), n, vec3(c5, c5, 0)
-        ,   vec3(-x+offset, y-(offset/2),-x+offset), n, vec3(c4, c5, 0)
-        };
-    };
-
-    std::vector<vec3> ret = face_z(vec3(0,0,1));
-    std::vector<vec3> zminus = face_z(vec3(0,0,-1));
-    std::vector<vec3> xplus = face_x(vec3(1,0,0));
-    std::vector<vec3> xminus = face_x(vec3(-1,0,0));
-    std::vector<vec3> edgezplustop = edge_z(vec3(0,0,1), vec3(0,1,0));
-    std::vector<vec3> edgezplusbot = edge_z(vec3(0,0,1), vec3(0,-1,0));
-    std::vector<vec3> edgezminustop = edge_z(vec3(0,0,-1), vec3(0,1,0));
-    std::vector<vec3> edgezminusbot = edge_z(vec3(0,0,-1), vec3(0,-1,0));
-    std::vector<vec3> edgexplustop = edge_x(vec3(1,0,0), vec3(0,1,0));
-    std::vector<vec3> edgexplusbot = edge_x(vec3(1,0,0), vec3(0,-1,0));
-    std::vector<vec3> edgexminustop = edge_x(vec3(-1,0,0), vec3(0,1,0));
-    std::vector<vec3> edgexminusbot = edge_x(vec3(-1,0,0), vec3(0,-1,0));
-    std::vector<vec3> middleplate = plate(vec3(0,1,0));
-
-    ret.insert(ret.end(), zminus.begin(), zminus.end());
-    ret.insert(ret.end(), xplus.begin(), xplus.end());
-    ret.insert(ret.end(), xminus.begin(), xminus.end());
-    ret.insert(ret.end(), edgezplustop.begin(), edgezplustop.end());
-    ret.insert(ret.end(), edgezplusbot.begin(), edgezplusbot.end());
-    ret.insert(ret.end(), edgezminustop.begin(), edgezminustop.end());
-    ret.insert(ret.end(), edgezminusbot.begin(), edgezminusbot.end());
-    ret.insert(ret.end(), edgexplustop.begin(), edgexplustop.end());
-    ret.insert(ret.end(), edgexplusbot.begin(), edgexplusbot.end());
-    ret.insert(ret.end(), edgexminustop.begin(), edgexminustop.end());
-    ret.insert(ret.end(), edgexminusbot.begin(), edgexminusbot.end());
-    ret.insert(ret.end(), middleplate.begin(), middleplate.end());
-
-    return ret;
 }
 
 
