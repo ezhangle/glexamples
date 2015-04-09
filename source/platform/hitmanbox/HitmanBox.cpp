@@ -25,6 +25,7 @@ std::vector<vec3> HitmanBox::vertices(const gl::GLfloat size, const gl::GLfloat 
     const gl::GLfloat y = height / 2;
     const gl::GLfloat total = size + 4*height + 2*offset;
 
+    // For texture coordinates
     const gl::GLfloat c0 = 0;
     const gl::GLfloat c1 = height/total;
     const gl::GLfloat c2 = (height+offset)/total;
@@ -38,7 +39,7 @@ std::vector<vec3> HitmanBox::vertices(const gl::GLfloat size, const gl::GLfloat 
 
 
     return {
-        
+
     // plus Z (frontface)
         vec3( x, y, x), vec3(0,0,1), vec3(c6, c3, 0)
     ,   vec3(-x, y, x), vec3(0,0,1), vec3(c3, c3, 0)
