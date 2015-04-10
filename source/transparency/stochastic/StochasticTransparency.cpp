@@ -49,16 +49,12 @@ using widgetzeug::make_unique;
 
 StochasticTransparency::StochasticTransparency(gloperate::ResourceManager & resourceManager)
 :   Painter{resourceManager}
-,   m_targetFramebufferCapability{make_unique<gloperate::TargetFramebufferCapability>()}
-,   m_viewportCapability{make_unique<gloperate::ViewportCapability>()}
-,   m_projectionCapability{make_unique<gloperate::PerspectiveProjectionCapability>(m_viewportCapability.get())}
-,   m_cameraCapability{make_unique<gloperate::CameraCapability>()}
+,   m_targetFramebufferCapability{addCapability(make_unique<gloperate::TargetFramebufferCapability>())}
+,   m_viewportCapability{addCapability(make_unique<gloperate::ViewportCapability>())}
+,   m_projectionCapability{addCapability(make_unique<gloperate::PerspectiveProjectionCapability>(m_viewportCapability))}
+,   m_cameraCapability{addCapability(make_unique<gloperate::CameraCapability>())}
 ,   m_options{make_unique<StochasticTransparencyOptions>(*this)}
 {
-    addCapability(m_targetFramebufferCapability.get());
-    addCapability(m_viewportCapability.get());
-    addCapability(m_projectionCapability.get());
-    addCapability(m_cameraCapability.get());
 }
 
 StochasticTransparency::~StochasticTransparency() = default;

@@ -44,20 +44,15 @@ using namespace globjects;
 using widgetzeug::make_unique;
 
 ScreenDoor::ScreenDoor(gloperate::ResourceManager & resourceManager)
-:   Painter{resourceManager}
-,   m_targetFramebufferCapability{make_unique<gloperate::TargetFramebufferCapability>()}
-,   m_viewportCapability{make_unique<gloperate::ViewportCapability>()}
-,   m_projectionCapability{make_unique<gloperate::PerspectiveProjectionCapability>(m_viewportCapability.get())}
-,   m_cameraCapability{make_unique<gloperate::CameraCapability>()}
+:   Painter(resourceManager)
+,   m_targetFramebufferCapability{addCapability(make_unique<gloperate::TargetFramebufferCapability>())}
+,   m_viewportCapability{addCapability(make_unique<gloperate::ViewportCapability>())}
+,   m_projectionCapability{addCapability(make_unique<gloperate::PerspectiveProjectionCapability>(m_viewportCapability))}
+,   m_cameraCapability{addCapability(make_unique<gloperate::CameraCapability>())}
 ,   m_multisampling{false}
 ,   m_multisamplingChanged{false}
 ,   m_transparency{0.5}
-{
-    addCapability(m_targetFramebufferCapability.get());
-    addCapability(m_viewportCapability.get());
-    addCapability(m_projectionCapability.get());
-    addCapability(m_cameraCapability.get());
-    
+{    
     setupPropertyGroup();
 }
 
